@@ -3,18 +3,29 @@ package handlers
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Pong(c *fiber.Ctx) error {
-	res, err := runPython("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./file/csv")
-	fmt.Print(res)
-	fmt.Print(err)
+	mkDir("./file/csv")
+	mkDir("./file/raw")
+	/* res, err := runPython("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./file/csv")
+	 * fmt.Print(res)
+	 * fmt.Print(err) */
 	return c.Status(200).SendString("ok")
 }
 
+func mkDir(p string) (err error) {
+	// newpath := filepath.Join()
+	err = os.MkdirAll(p, os.ModePerm)
+	return
+}
+
 func UploadFile(c *fiber.Ctx) error {
+	mkDir("./file/csv")
+	mkDir("./file/raw")
 	file, err := c.FormFile("file")
 
 	if err != nil {
