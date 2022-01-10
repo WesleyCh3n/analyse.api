@@ -24,8 +24,8 @@ func mkDir(p string) (err error) {
 }
 
 func UploadFile(c *fiber.Ctx) error {
-	mkDir("./file/csv")
-	mkDir("./file/raw")
+	// mkDir("./file/csv")
+	// mkDir("./file/raw")
 	file, err := c.FormFile("file")
 
 	if err != nil {
@@ -65,25 +65,31 @@ func UploadFile(c *fiber.Ctx) error {
 
 	// generate image url to serve to client using CDN
 
-	imageUrl := fmt.Sprintf("/file/csv/%s", uploadFile)
-	resultUrl := fmt.Sprintf("/%s", outList[0])
-	cycleUrl := fmt.Sprintf("/%s", outList[1])
+	uploadUrl := fmt.Sprintf("/file/csv/%s", uploadFile)
+	rsltUrl := fmt.Sprintf("/%s", outList[0])
+	cyclUrl := fmt.Sprintf("/%s", outList[1])
+	cyltUrl := fmt.Sprintf("/%s", outList[2])
+	cyrtUrl := fmt.Sprintf("/%s", outList[3])
+	cydbUrl := fmt.Sprintf("/%s", outList[4])
 
 	// create meta data and send to client
 
 	data := map[string]interface{}{
 
 		"imageName": uploadFile,
-		"imageUrl":  imageUrl,
+		"imageUrl":  uploadUrl,
 		"header":    file.Header,
 		"size":      file.Size,
 	}
 
 	return c.JSON(fiber.Map{
-		"status":    201,
-		"message":   "Image uploaded successfully",
-		"resultUrl": resultUrl,
-		"cycleUrl":  cycleUrl,
-		"data":      data,
+		"status":  201,
+		"message": "uploaded successfully",
+		"rsltUrl": rsltUrl,
+		"cyclUrl": cyclUrl,
+		"cyltUrl": cyltUrl,
+		"cyrtUrl": cyrtUrl,
+		"cydbUrl": cydbUrl,
+		"data":    data,
 	})
 }
