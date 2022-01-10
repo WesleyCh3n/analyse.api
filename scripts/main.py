@@ -90,20 +90,32 @@ if __name__ == "__main__":
     a_label_mG, a_label_SI = [], []
     for pos, ax in zipObj:
         sel_dict[f'{pos} Accel Sensor {ax} (mG)'] = f'{pos}_A_{ax}_mG'
+        sel_dict[f'Noraxon MyoMotion-Segments-{pos}-Gyroscope-{ax.lower()} (deg/s)'] = f'{pos}_Gyro_{ax}'
         a_label_mG.append(f'{pos}_A_{ax}_mG')
         a_label_SI.append(f'{pos}_A_{ax}')
 
     raw_data = pd.read_csv(args.file, skiprows=[0,1,2], low_memory=False)
-    df = createSelectDF(raw_data, sel_dict)
-    df[['RT_contact', 'LT_contact']] = df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
 
+    # select columns
+    df = createSelectDF(raw_data, sel_dict)
+
+    # convert to SI Unit
     df = convertMilliGToSI(df, a_label_mG, a_label_SI) # NOTE: out: [...f'{pos}_A_{ax}']
+
+    # calculate support time
+    df[['RT_contact', 'LT_contact']] = df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
     df = separateSupportTime(df) # NOTE: out: ['double_support', 'RT_single_support', 'LT_single_support']
+
+    # drop unnecessary columns
+    df = df.drop(columns=a_label_mG + ['RT_contact', 'LT_contact'])
+
+    # create cycle list
     cycle, dfCycle = createGaitCycleList(df, 2, 'double_support')
     _, dflt = createCycleList(df, "LT_single_support")
     _, dfrt = createCycleList(df, "RT_single_support")
     _, dfdb = createCycleList(df, "double_support")
 
+    #=================================================================#
     # Export
     date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
     name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
@@ -115,15 +127,7 @@ if __name__ == "__main__":
     rt_path = Path(args.save) / f'{date}_cycle-rt_{name}_{num}.csv'
     db_path = Path(args.save) / f'{date}_cycle-db_{name}_{num}.csv'
 
-    df[
-        [
-            'time',
-            'double_support',
-            'RT_single_support',
-            'LT_single_support'
-        ] + a_label_SI
-    ].replace({True: 1, False: 0}).to_csv(rslt_path, index=False)
-
+    df.replace({True: 1, False: 0}).to_csv(rslt_path, index=False)
     dfCycle.to_csv(cyc_path, index=False)
     dflt.to_csv(lt_path, index=False)
     dfrt.to_csv(rt_path, index=False)
