@@ -11,9 +11,6 @@ import (
 func Pong(c *fiber.Ctx) error {
 	mkDir("./file/csv")
 	mkDir("./file/raw")
-	/* res, err := runPython("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./file/csv")
-	 * fmt.Print(res)
-	 * fmt.Print(err) */
 	return c.Status(200).SendString("ok")
 }
 
