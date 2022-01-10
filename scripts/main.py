@@ -83,18 +83,20 @@ if __name__ == "__main__":
     axis = ['X', 'Y', 'Z']
     zipObj = zip(np.repeat(positions, 3), axis * 3) # HACK: zip repeat
     sel_dict = {
+        # init index
         'time': 'time', # time index
         'Noraxon MyoMotion-Segments-Foot RT-Contact': 'RT_contact', # R contact index
         'Noraxon MyoMotion-Segments-Foot LT-Contact': 'LT_contact', # L contact index
     }
     a_label_mG, a_label_SI = [], []
     for pos, ax in zipObj:
+        # select index
         sel_dict[f'{pos} Accel Sensor {ax} (mG)'] = f'{pos}_A_{ax}_mG'
         sel_dict[f'Noraxon MyoMotion-Segments-{pos}-Gyroscope-{ax.lower()} (deg/s)'] = f'{pos}_Gyro_{ax}'
         a_label_mG.append(f'{pos}_A_{ax}_mG')
         a_label_SI.append(f'{pos}_A_{ax}')
 
-    raw_data = pd.read_csv(args.file, skiprows=[0,1,2], low_memory=False)
+    raw_data = pd.read_csv(args.file, skiprows=np.array([0,1,2]), low_memory=False)
 
     # select columns
     df = createSelectDF(raw_data, sel_dict)
