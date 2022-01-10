@@ -54,7 +54,27 @@ def createGaitCycleList(df, step=2, dsIndex="double_support"):
     doubleSupportStartIndex = np.where(mask)[0] + 1
     gStart = doubleSupportStartIndex[::step]
 
-    return list(zip(gStart, gStart[1:])), df.loc[gStart, 'time'].copy()
+    # add start and end index for drawing
+    dfIndex = np.r_[0, gStart, df.shape[0]-1]
+    dfStep = df.loc[dfIndex, 'time'].copy().to_frame(name="start").reset_index(drop=True)
+    dfStep['end'] = dfStep.shift(-1)
+
+    return list(zip(gStart, gStart[1:])), dfStep
+
+def createCycleList(df, dsIndex):
+    arr = df[dsIndex].values
+    mask = (arr[:-1]==False) & (arr[1:]==True)
+    startIndex = np.where(mask)[0] + 1
+    mask = (arr[:-1]==True) & (arr[1:]==False)
+    endIndex = np.where(mask)[0] + 1
+
+    if dsIndex == 'double_support':
+        startIndex, endIndex = startIndex[:-1], endIndex[1:]
+
+    dfStep = df.loc[startIndex, 'time'].copy().to_frame(name="start").reset_index(drop=True)
+    dfStep['end'] = df.loc[endIndex, 'time'].copy().to_frame(name="end").reset_index(drop=True)
+
+    return [(s, e) for s, e in zip(startIndex, endIndex)], dfStep
 
 if __name__ == "__main__":
     # NOTE:
@@ -80,20 +100,37 @@ if __name__ == "__main__":
     df = convertMilliGToSI(df, a_label_mG, a_label_SI) # NOTE: out: [...f'{pos}_A_{ax}']
     df = separateSupportTime(df) # NOTE: out: ['double_support', 'RT_single_support', 'LT_single_support']
     cycle, dfCycle = createGaitCycleList(df, 2, 'double_support')
+    _, dflt = createCycleList(df, "LT_single_support")
+    _, dfrt = createCycleList(df, "RT_single_support")
+    _, dfdb = createCycleList(df, "double_support")
 
     # Export
     date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
     name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
     num = re.findall(r'(\d+)\.csv', args.file)[0]
-    df[[
-        'time',
-        'double_support',
-        'RT_single_support',
-        'LT_single_support'
-    ] + a_label_SI ].replace({True: 1, False: 0}).to_csv(Path(args.save) / f'{date}_result_{name}_{num}.csv', index=False)
 
-    # dfCycle.index.name = 'index'
-    dfCycle.to_csv(Path(args.save) / f'{date}_cycle_{name}_{num}.csv')
+    rslt_path = Path(args.save) / f'{date}_result_{name}_{num}.csv'
+    cyc_path = Path(args.save) / f'{date}_cycle_{name}_{num}.csv'
+    lt_path = Path(args.save) / f'{date}_cycle-lt_{name}_{num}.csv'
+    rt_path = Path(args.save) / f'{date}_cycle-rt_{name}_{num}.csv'
+    db_path = Path(args.save) / f'{date}_cycle-db_{name}_{num}.csv'
 
-    print(Path(args.save) / f'{date}_result_{name}_{num}.csv')
-    print(Path(args.save) / f'{date}_cycle_{name}_{num}.csv')
+    df[
+        [
+            'time',
+            'double_support',
+            'RT_single_support',
+            'LT_single_support'
+        ] + a_label_SI
+    ].replace({True: 1, False: 0}).to_csv(rslt_path, index=False)
+
+    dfCycle.to_csv(cyc_path, index=False)
+    dflt.to_csv(lt_path, index=False)
+    dfrt.to_csv(rt_path, index=False)
+    dfdb.to_csv(db_path, index=False)
+
+    print(rslt_path)
+    print(cyc_path)
+    print(lt_path)
+    print(rt_path)
+    print(db_path)
