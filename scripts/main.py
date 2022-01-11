@@ -26,7 +26,7 @@ parser.add_argument("-s",
 
 args = parser.parse_args()
 
-POSITION = ['Pelvis', "Lower spine", "Upper spine", "Head"]
+POSITION = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
 AXIS = ['X', 'Y', 'Z']
 
 def argsProcess():

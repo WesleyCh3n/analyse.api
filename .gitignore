@@ -2,3 +2,4 @@
 file/*
 out
 tmp/*
+*.pyc
