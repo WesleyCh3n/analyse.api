@@ -38,7 +38,10 @@ func UploadFile(c *fiber.Ctx) error {
 	uploadFile := file.Filename
 
 	// save image to ./file/csv dir
-	err = c.SaveFile(file, fmt.Sprintf("./file/csv/%s", uploadFile))
+	serverOrigin := "http://localhost:3001"
+	saveDir := "file/csv"
+	filePath := fmt.Sprintf("./%s/%s", saveDir, uploadFile)
+	err = c.SaveFile(file, filePath)
 
 	if err != nil {
 		log.Println("image save error --> ", err)
@@ -49,7 +52,7 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	outList, err := runPython(fmt.Sprintf("./file/csv/%s", uploadFile), "./file/csv")
+	outList, err := runPython(filePath, saveDir)
 
 	if err != nil {
 		log.Println("cannot run python script", err)
@@ -61,20 +64,16 @@ func UploadFile(c *fiber.Ctx) error {
 	}
 
 	// generate image url to serve to client using CDN
-
-	uploadUrl := fmt.Sprintf("/file/csv/%s", uploadFile)
-	rsltUrl := fmt.Sprintf("/%s", outList[0])
-	cyclUrl := fmt.Sprintf("/%s", outList[1])
-	cyltUrl := fmt.Sprintf("/%s", outList[2])
-	cyrtUrl := fmt.Sprintf("/%s", outList[3])
-	cydbUrl := fmt.Sprintf("/%s", outList[4])
+	rsltUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[0])
+	cyclUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[1])
+	cyltUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[2])
+	cyrtUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[3])
+	cydbUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[4])
 
 	// create meta data and send to client
 
 	data := map[string]interface{}{
-
 		"imageName": uploadFile,
-		"imageUrl":  uploadUrl,
 		"header":    file.Header,
 		"size":      file.Size,
 	}

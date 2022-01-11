@@ -5,6 +5,7 @@ import (
 	"server/handlers"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 var (
@@ -26,6 +27,7 @@ func NewServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		BodyLimit: 100 * 1024 * 1024, // 100 mb
 	})
+	app.Use(cors.New()) // cross origin
 
 	setupRoutes(app)
 
