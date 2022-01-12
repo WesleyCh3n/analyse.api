@@ -9,7 +9,7 @@ import (
 )
 
 func Pong(c *fiber.Ctx) error {
-	getFilteredData("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
+	// getFilteredData("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
 	return c.Status(200).SendString("ok")
 }
 
