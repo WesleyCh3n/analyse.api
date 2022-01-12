@@ -9,7 +9,9 @@ def createSelectDF(df, sel_dict: dict) -> pd.DataFrame:
     'original_index_name': 'perfered_index_name',
   }
   """
-    return df[list(sel_dict.keys())].rename(columns=sel_dict)
+    selected_df = df[list(sel_dict.keys())].rename(columns=sel_dict)
+    selected_df[['RT_contact', 'LT_contact']] = selected_df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
+    return selected_df
 
 def convertMilliGToSI(df, index: list, out_index: list) -> pd.DataFrame:
     factor = 9.80665 * 10**(-3)

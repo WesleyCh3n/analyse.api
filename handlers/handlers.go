@@ -9,13 +9,11 @@ import (
 )
 
 func Pong(c *fiber.Ctx) error {
-	mkDir("./file/csv")
-	mkDir("./file/raw")
+	runPython("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
 	return c.Status(200).SendString("ok")
 }
 
 func mkDir(p string) (err error) {
-	// newpath := filepath.Join()
 	err = os.MkdirAll(p, os.ModePerm)
 	return
 }
@@ -37,8 +35,8 @@ func UploadFile(c *fiber.Ctx) error {
 	// generate uploadFile from filename and extension
 	uploadFile := file.Filename
 
-	// save image to ./file/csv dir
-	serverOrigin := "http://localhost:3001"
+	// save upload file to ./file/csv dir
+	serverRoot := "http://localhost:3001"
 	saveDir := "file/csv"
 	filePath := fmt.Sprintf("./%s/%s", saveDir, uploadFile)
 	err = c.SaveFile(file, filePath)
@@ -52,7 +50,7 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	outList, err := runPython(filePath, saveDir)
+	path, err := runPython(filePath, saveDir)
 
 	if err != nil {
 		log.Println("cannot run python script", err)
@@ -63,29 +61,21 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	// generate image url to serve to client using CDN
-	rsltUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[0])
-	cyclUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[1])
-	cyltUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[2])
-	cyrtUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[3])
-	cydbUrl := fmt.Sprintf("%s/%s", serverOrigin, outList[4])
-
 	// create meta data and send to client
-
 	data := map[string]interface{}{
-		"imageName": uploadFile,
-		"header":    file.Header,
-		"size":      file.Size,
+		"UploadFile": uploadFile,
+		"header":     file.Header,
+		"size":       file.Size,
+		"rsltUrl":    fmt.Sprintf("%s/%s", serverRoot, path.Result),
+		"cyclUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyGt),
+		"cyltUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyLt),
+		"cyrtUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyRt),
+		"cydbUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyDb),
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  201,
 		"message": "uploaded successfully",
-		"rsltUrl": rsltUrl,
-		"cyclUrl": cyclUrl,
-		"cyltUrl": cyltUrl,
-		"cyrtUrl": cyrtUrl,
-		"cydbUrl": cydbUrl,
 		"data":    data,
 	})
 }

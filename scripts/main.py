@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# purpose: python3 main.py -f <file.csv>
+# purpose: python3 main.py -f <file.csv> -s <out dir>
 # output:
 #   1. support + acceleration.csv
 #   3. cycle.csv
@@ -10,11 +10,13 @@ import pandas as pd
 import numpy as np
 import argparse
 import re
+import json
 
 from pathlib import Path
 from numpy import array
 from module.preprocess import createSelectDF, convertMilliGToSI, separateSupportTime
 from module.cycle import createGaitCycleList, createCycleList
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f",
@@ -26,39 +28,46 @@ parser.add_argument("-s",
 
 args = parser.parse_args()
 
-POSITION = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
-AXIS = ['X', 'Y', 'Z']
-
 def argsProcess():
     date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
     name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
     num = re.findall(r'(\d+)\.csv', args.file)[0]
     return date, name, num
 
-def main():
-    # NOTE:
-    # col: [time, acceleration[CTLS], contact[RL]]
-    zipObj = zip(np.repeat(array(POSITION), 3), AXIS * 3) # HACK: zip repeat
+def selectIndex(position):
+    # [time, [LR] contact, [position] accel/gyro]
     sel_dict = {
         # init index
         'time': 'time', # time index
         'Noraxon MyoMotion-Segments-Foot RT-Contact': 'RT_contact', # R contact index
         'Noraxon MyoMotion-Segments-Foot LT-Contact': 'LT_contact', # L contact index
     }
-    a_label_mG, a_label_SI = [], []
-    for pos, ax in zipObj:
-        # select index
+    for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3): # HACK: zip repeat:
+        # Acceleration [XYZ]
         sel_dict[f'{pos} Accel Sensor {ax} (mG)'] = f'{pos}_A_{ax}_mG'
+        # Gyroscope [XYZ]
         sel_dict[f'Noraxon MyoMotion-Segments-{pos}-Gyroscope-{ax.lower()} (deg/s)'] = f'{pos}_Gyro_{ax}'
-        a_label_mG.append(f'{pos}_A_{ax}_mG')
-        a_label_SI.append(f'{pos}_A_{ax}')
+    return sel_dict
+
+def saveDf(df, path):
+    try:
+        df.to_csv(path, index=False)
+    except:
+        return "Error"
+
+    return str(path)
+
+def main():
+    position = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
+    sel_dict = selectIndex(position)
 
     raw_data = pd.read_csv(args.file, skiprows=array([0,1,2]), low_memory=False)
     df = createSelectDF(raw_data, sel_dict) # select columns
-    df[['RT_contact', 'LT_contact']] = df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
 
-    df = convertMilliGToSI(df, a_label_mG, a_label_SI) # INFO: out: [...f'{pos}_A_{ax}']
-    df = separateSupportTime(df) # INFO: out: ['double_support', 'RT_single_support', 'LT_single_support']
+    a_label_mG = [f'{pos}_A_{ax}_mG' for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3)]
+    a_label_SI = [f'{pos}_A_{ax}' for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3)]
+    df = convertMilliGToSI(df, a_label_mG, a_label_SI)
+    df = separateSupportTime(df)
     df = df.drop(columns=a_label_mG + ['RT_contact', 'LT_contact']) # drop unnecessary columns
 
     # create cycle list
@@ -70,23 +79,38 @@ def main():
     #=================================================================#
     # Export
     date, name, num = argsProcess()
-    rslt_path = Path(args.save) / f'{date}_result_{name}_{num}.csv'
-    cyc_path = Path(args.save) / f'{date}_cycle_{name}_{num}.csv'
-    lt_path = Path(args.save) / f'{date}_cycle-lt_{name}_{num}.csv'
-    rt_path = Path(args.save) / f'{date}_cycle-rt_{name}_{num}.csv'
-    db_path = Path(args.save) / f'{date}_cycle-db_{name}_{num}.csv'
+    print(json.dumps({
+        'Result': saveDf(df.replace({True: 1, False: 0}), Path(args.save)/f'{date}_result_{name}_{num}.csv'),
+        'CyGt': saveDf(dfcy, Path(args.save)/f'{date}_CyGt_{name}_{num}.csv'),
+        'CyLt': saveDf(dflt, Path(args.save)/f'{date}_CyLt_{name}_{num}.csv'),
+        'CyRt': saveDf(dfrt, Path(args.save)/f'{date}_CyRt_{name}_{num}.csv'),
+        'CyDb': saveDf(dfdb, Path(args.save)/f'{date}_CyDb_{name}_{num}.csv'),
+    }))
+    # rslt_path = Path(args.save) / f'{date}_result_{name}_{num}.csv'
+    # cyc_path = Path(args.save) / f'{date}_cycle_{name}_{num}.csv'
+    # lt_path = Path(args.save) / f'{date}_cycle-lt_{name}_{num}.csv'
+    # rt_path = Path(args.save) / f'{date}_cycle-rt_{name}_{num}.csv'
+    # db_path = Path(args.save) / f'{date}_cycle-db_{name}_{num}.csv'
 
-    df.replace({True: 1, False: 0}).to_csv(rslt_path, index=False)
-    dfcy.to_csv(cyc_path, index=False)
-    dflt.to_csv(lt_path, index=False)
-    dfrt.to_csv(rt_path, index=False)
-    dfdb.to_csv(db_path, index=False)
+    # df.replace({True: 1, False: 0}).to_csv(rslt_path, index=False)
+    # dfcy.to_csv(cyc_path, index=False)
+    # dflt.to_csv(lt_path, index=False)
+    # dfrt.to_csv(rt_path, index=False)
+    # dfdb.to_csv(db_path, index=False)
 
-    print(rslt_path)
-    print(cyc_path)
-    print(lt_path)
-    print(rt_path)
-    print(db_path)
+    # TODO: fix with json dump
+    # print(rslt_path)
+    # print(cyc_path)
+    # print(lt_path)
+    # print(rt_path)
+    # print(db_path)
+    # print(json.dumps({
+    # 'rslt_path': str(rslt_path),
+    # 'cyc_path': str(cyc_path),
+    # 'lt_path': str(lt_path),
+    # 'rt_path': str(rt_path),
+    # 'db_path': str(db_path),
+    # }))
 
 if __name__ == "__main__":
     main()

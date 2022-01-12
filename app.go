@@ -27,11 +27,13 @@ func NewServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		BodyLimit: 100 * 1024 * 1024, // 100 mb
 	})
-	app.Use(cors.New()) // cross origin
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000", // cross origin
+	}))
 
 	setupRoutes(app)
 
-	app.Static("/", *staticFile)
+	// app.Static("/", *staticFile) // if serve static web
 
 	return app
 }
