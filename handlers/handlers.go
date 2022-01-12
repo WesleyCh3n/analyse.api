@@ -9,7 +9,7 @@ import (
 )
 
 func Pong(c *fiber.Ctx) error {
-	runPython("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
+	getFilteredData("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
 	return c.Status(200).SendString("ok")
 }
 
@@ -19,8 +19,8 @@ func mkDir(p string) (err error) {
 }
 
 func UploadFile(c *fiber.Ctx) error {
-	// mkDir("./file/csv")
-	// mkDir("./file/raw")
+	mkDir("./file/csv")
+	mkDir("./file/raw")
 	file, err := c.FormFile("file")
 
 	if err != nil {
@@ -37,8 +37,8 @@ func UploadFile(c *fiber.Ctx) error {
 
 	// save upload file to ./file/csv dir
 	serverRoot := "http://localhost:3001"
-	saveDir := "file/csv"
-	filePath := fmt.Sprintf("./%s/%s", saveDir, uploadFile)
+	uploadDir := "file/raw"
+	filePath := fmt.Sprintf("./%s/%s", uploadDir, uploadFile)
 	err = c.SaveFile(file, filePath)
 
 	if err != nil {
@@ -50,7 +50,8 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	path, err := runPython(filePath, saveDir)
+	saveDir := "file/csv"
+	path, err := getFilteredData(filePath, saveDir)
 
 	if err != nil {
 		log.Println("cannot run python script", err)

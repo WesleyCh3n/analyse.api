@@ -14,8 +14,8 @@ type Path struct {
 	CyDb   string `json:"CyDb"`
 }
 
-func runPython(csvFile, outDir string) (Path, error) {
-	cmd := exec.Command("./scripts/main.py", "-f", csvFile, "-s", outDir)
+func getFilteredData(csvFile, outDir string) (Path, error) {
+	cmd := exec.Command("./scripts/filter.py", "-f", csvFile, "-s", outDir)
 	stdout, err := cmd.Output()
 
 	resultPath := Path{}

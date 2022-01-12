@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 
 import pandas as pd
+import numpy as np
+from numpy import array
+
+def selectIndex(position):
+    # [time, [LR] contact, [position] accel/gyro]
+    sel_dict = {
+        # init index
+        'time': 'time', # time index
+        'Noraxon MyoMotion-Segments-Foot RT-Contact': 'RT_contact', # R contact index
+        'Noraxon MyoMotion-Segments-Foot LT-Contact': 'LT_contact', # L contact index
+    }
+    for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3): # HACK: zip repeat:
+        # Acceleration [XYZ]
+        sel_dict[f'{pos} Accel Sensor {ax} (mG)'] = f'{pos}_A_{ax}_mG'
+        # Gyroscope [XYZ]
+        sel_dict[f'Noraxon MyoMotion-Segments-{pos}-Gyroscope-{ax.lower()} (deg/s)'] = f'{pos}_Gyro_{ax}'
+    return sel_dict
 
 def createSelectDF(df, sel_dict: dict) -> pd.DataFrame:
     """
