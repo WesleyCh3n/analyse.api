@@ -80,3 +80,19 @@ func UploadFile(c *fiber.Ctx) error {
 		"data":    data,
 	})
 }
+
+func Export(c *fiber.Ctx) error {
+	result := ExportJson{}
+
+	if err := c.BodyParser(&result); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	exportCsv(result)
+
+	return c.JSON(fiber.Map{
+		"status":  201,
+		"message": "Export complete",
+	})
+}

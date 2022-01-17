@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-type Path struct {
+type CsvPathJson struct {
 	Result string `json:"Result"`
 	CyGt   string `json:"CyGt"`
 	CyLt   string `json:"CyLt"`
@@ -14,11 +14,11 @@ type Path struct {
 	CyDb   string `json:"CyDb"`
 }
 
-func getFilteredData(csvFile, outDir string) (Path, error) {
+func getFilteredData(csvFile, outDir string) (CsvPathJson, error) {
 	cmd := exec.Command("./scripts/filter.py", "-f", csvFile, "-s", outDir)
 	stdout, err := cmd.Output()
 
-	resultPath := Path{}
+	resultPath := CsvPathJson{}
 	if err != nil {
 		fmt.Println(err.Error())
 		return resultPath, err

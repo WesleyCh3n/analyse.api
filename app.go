@@ -18,6 +18,7 @@ func setupRoutes(app *fiber.App) {
 	apiGroup := app.Group("/api")
 	apiGroup.Get("/ping", handlers.Pong)
 	apiGroup.Post("/upload", handlers.UploadFile)
+	apiGroup.Post("/export", handlers.Export)
 
 	fileGroup := app.Group("/file")
 	fileGroup.Static("/csv", "./file/csv/")
@@ -30,7 +31,6 @@ func NewServer() *fiber.App {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://localhost:3000", // cross origin
 	}))
-	// app.Use(cors.New())
 
 	setupRoutes(app)
 
