@@ -82,7 +82,7 @@ func UploadFile(c *fiber.Ctx) error {
 }
 
 func Export(c *fiber.Ctx) error {
-	result := ExportJson{}
+	result := ReqExport{}
 
 	if err := c.BodyParser(&result); err != nil {
 		log.Println(err)

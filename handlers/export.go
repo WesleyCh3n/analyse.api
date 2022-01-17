@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type ExportJson struct {
+type ReqExport struct {
 	RawFile string `json:"RawFile"`
 	Ranges  []struct {
 		Start int
@@ -14,13 +14,13 @@ type ExportJson struct {
 	} `json:"Ranges"`
 }
 
-func exportCsv(e ExportJson) error {
+func exportCsv(r ReqExport) error {
 	args := []string{}
-	for _, r := range e.Ranges {
-		args = append(args, "-r", strconv.Itoa(r.Start), strconv.Itoa(r.End))
+	for _, _r := range r.Ranges {
+		args = append(args, "-r", strconv.Itoa(_r.Start), strconv.Itoa(_r.End))
 	}
 
-	cmd := exec.Command("./scripts/export.py", args...)
+	cmd := exec.Command("./scripts/exporter.py", args...)
 	stdout, err := cmd.Output()
 
 	fmt.Print(string(stdout[:]))
