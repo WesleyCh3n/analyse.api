@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import pandas as pd
 # import numpy as np
 
@@ -15,7 +16,7 @@ parser.add_argument("-c", type=str,)
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    prefix = "./file/csv/"
+    prefix = "file/csv/"
     df = pd.read_csv(prefix+args.f)
     cygt = pd.read_csv(prefix+ args.c)
     df = df[df.columns.drop(list(df.filter(regex='support')))] # drop by regex
@@ -48,4 +49,7 @@ if __name__ == "__main__":
     result = pd.concat([pd.DataFrame({0: selection}, index=['Selection']),
                         concat_df])
     result = result.rename(columns={0: args.f})
-    print(result)
+    result.to_csv(prefix +'result.csv')
+    print(json.dumps({
+        'ExportFile': prefix +'result.csv'
+    }))

@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 def saveDf(df, path):
     try:
-        df.to_csv(path, index=False)
+        df.to_csv(Path(args.save)/path, index=False)
     except:
         return "Error"
 
@@ -62,11 +62,11 @@ def main():
     num = re.findall(r'(\d+)\.csv', args.file)[0]
 
     print(json.dumps({
-        'Result': saveDf(df.replace({True: 1, False: 0}), Path(args.save)/f'{date}_result_{name}_{num}.csv'),
-        'CyGt': saveDf(dfcy, Path(args.save)/f'{date}_CyGt_{name}_{num}.csv'),
-        'CyLt': saveDf(dflt, Path(args.save)/f'{date}_CyLt_{name}_{num}.csv'),
-        'CyRt': saveDf(dfrt, Path(args.save)/f'{date}_CyRt_{name}_{num}.csv'),
-        'CyDb': saveDf(dfdb, Path(args.save)/f'{date}_CyDb_{name}_{num}.csv'),
+        'Result': saveDf(df.replace({True: 1, False: 0}), f'{date}_result_{name}_{num}.csv'),
+        'CyGt': saveDf(dfcy, f'{date}_CyGt_{name}_{num}.csv'),
+        'CyLt': saveDf(dflt, f'{date}_CyLt_{name}_{num}.csv'),
+        'CyRt': saveDf(dfrt, f'{date}_CyRt_{name}_{num}.csv'),
+        'CyDb': saveDf(dfdb, f'{date}_CyDb_{name}_{num}.csv'),
     }))
 
 if __name__ == "__main__":

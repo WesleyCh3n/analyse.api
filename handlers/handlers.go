@@ -67,11 +67,12 @@ func UploadFile(c *fiber.Ctx) error {
 		"UploadFile": uploadFile,
 		"header":     file.Header,
 		"size":       file.Size,
-		"rsltUrl":    fmt.Sprintf("%s/%s", serverRoot, path.Result),
-		"cyclUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyGt),
-		"cyltUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyLt),
-		"cyrtUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyRt),
-		"cydbUrl":    fmt.Sprintf("%s/%s", serverRoot, path.CyDb),
+		"Prefix":     fmt.Sprintf("%s/%s", serverRoot, saveDir),
+		"rsltFile":   path.Result,
+		"cyclFile":   path.CyGt,
+		"cyltFile":   path.CyLt,
+		"cyrtFile":   path.CyRt,
+		"cydbFile":   path.CyDb,
 	}
 
 	return c.JSON(fiber.Map{

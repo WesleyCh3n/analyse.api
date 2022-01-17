@@ -7,8 +7,10 @@ import (
 )
 
 type ReqExport struct {
-	RawFile string `json:"RawFile"`
-	Ranges  []struct {
+	RawFile    string `json:"RawFile"`
+	ResultFile string `json:"ResultFile"`
+	GaitFile   string `json:"GaitFile"`
+	Ranges     []struct {
 		Start int
 		End   int
 	} `json:"Ranges"`
@@ -19,6 +21,7 @@ func exportCsv(r ReqExport) error {
 	for _, _r := range r.Ranges {
 		args = append(args, "-r", strconv.Itoa(_r.Start), strconv.Itoa(_r.End))
 	}
+	args = append(args, "-f", r.ResultFile, "-c", r.GaitFile)
 
 	cmd := exec.Command("./scripts/exporter.py", args...)
 	stdout, err := cmd.Output()
