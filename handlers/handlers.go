@@ -8,8 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+var serverRoot = "http://localhost:3001"
+
 func Pong(c *fiber.Ctx) error {
-	// getFilteredData("./file/raw/2021-09-26-18-36_ultium_motion_Dr Tsai_2021.09.26 Dr. Tsai_1.csv", "./scripts/")
 	return c.Status(200).SendString("ok")
 }
 
@@ -19,8 +20,6 @@ func mkDir(p string) (err error) {
 }
 
 func UploadFile(c *fiber.Ctx) error {
-	mkDir("./file/csv")
-	mkDir("./file/raw")
 	file, err := c.FormFile("file")
 
 	if err != nil {
@@ -36,11 +35,10 @@ func UploadFile(c *fiber.Ctx) error {
 	uploadFile := file.Filename
 
 	// save upload file to ./file/csv dir
-	serverRoot := "http://localhost:3001"
 	uploadDir := "file/raw"
+	mkDir(uploadDir)
 	filePath := fmt.Sprintf("./%s/%s", uploadDir, uploadFile)
 	err = c.SaveFile(file, filePath)
-
 	if err != nil {
 		log.Println("image save error --> ", err)
 		return c.JSON(fiber.Map{
@@ -51,7 +49,8 @@ func UploadFile(c *fiber.Ctx) error {
 	}
 
 	saveDir := "file/csv"
-	path, err := getFilteredData(filePath, saveDir)
+	mkDir(saveDir)
+	filteredData, err := getFilteredData(filePath, saveDir)
 
 	if err != nil {
 		log.Println("cannot run python script", err)
@@ -64,20 +63,14 @@ func UploadFile(c *fiber.Ctx) error {
 
 	// create meta data and send to client
 	data := map[string]interface{}{
-		"UploadFile": uploadFile,
-		"header":     file.Header,
-		"size":       file.Size,
-		"Prefix":     fmt.Sprintf("%s/%s", serverRoot, saveDir),
-		"rsltFile":   path.Result,
-		"cyclFile":   path.CyGt,
-		"cyltFile":   path.CyLt,
-		"cyrtFile":   path.CyRt,
-		"cydbFile":   path.CyDb,
+		"uploadFile": uploadFile,
+		"prefix":     fmt.Sprintf("%s/%s", serverRoot, saveDir),
+		"python":     filteredData,
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  201,
-		"message": "uploaded successfully",
+		"message": "Uploaded successfully",
 		"data":    data,
 	})
 }
@@ -90,10 +83,26 @@ func Export(c *fiber.Ctx) error {
 		return err
 	}
 
-	exportCsv(result)
+	saveDir := "file/export"
+	mkDir(saveDir)
+	exportData, err := exportCsv(result, saveDir)
+	if err != nil {
+		log.Println("Python script error", err)
+		return c.JSON(fiber.Map{
+			"status":  500,
+			"message": "Sub process error",
+			"data":    err,
+		})
+	}
+
+	data := map[string]interface{}{
+		"prefix": fmt.Sprintf("%s/%s", serverRoot, saveDir),
+		"python": exportData,
+	}
 
 	return c.JSON(fiber.Map{
 		"status":  201,
 		"message": "Export complete",
+		"data":    data,
 	})
 }

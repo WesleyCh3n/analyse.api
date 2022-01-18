@@ -22,6 +22,7 @@ func setupRoutes(app *fiber.App) {
 
 	fileGroup := app.Group("/file")
 	fileGroup.Static("/csv", "./file/csv/")
+	fileGroup.Static("/export", "./file/export/")
 }
 
 func NewServer() *fiber.App {

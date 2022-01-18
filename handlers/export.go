@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -16,24 +17,27 @@ type ReqExport struct {
 	} `json:"Ranges"`
 }
 
-func exportCsv(r ReqExport) error {
+type ResExport struct {
+	ExportFile string `json:"ExportFile"`
+}
+
+func exportCsv(r ReqExport, outDir string) (ResExport, error) {
 	args := []string{}
 	for _, _r := range r.Ranges {
 		args = append(args, "-r", strconv.Itoa(_r.Start), strconv.Itoa(_r.End))
 	}
-	args = append(args, "-f", r.ResultFile, "-c", r.GaitFile)
+	args = append(args, "-f", r.ResultFile, "-c", r.GaitFile, "-s", outDir)
 
 	cmd := exec.Command("./scripts/exporter.py", args...)
 	stdout, err := cmd.Output()
 
-	fmt.Print(string(stdout[:]))
-
+	resultExport := ResExport{}
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return resultExport, err
 	}
 
-	// json.Unmarshal(stdout, &resultPath)
+	json.Unmarshal(stdout, &resultExport)
 
-	return err
+	return resultExport, err
 }

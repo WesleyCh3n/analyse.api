@@ -7,11 +7,11 @@ import (
 )
 
 type ResFiltered struct {
-	Result string `json:"Result"`
-	CyGt   string `json:"CyGt"`
-	CyLt   string `json:"CyLt"`
-	CyRt   string `json:"CyRt"`
-	CyDb   string `json:"CyDb"`
+	RsltCSV string `json:"RsltCSV"`
+	CyGtCSV string `json:"CyGtCSV"`
+	CyLtCSV string `json:"CyLtCSV"`
+	CyRtCSV string `json:"CyRtCSV"`
+	CyDbCSV string `json:"CyDbCSV"`
 }
 
 func getFilteredData(csvFile, outDir string) (ResFiltered, error) {

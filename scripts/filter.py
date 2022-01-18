@@ -62,11 +62,11 @@ def main():
     num = re.findall(r'(\d+)\.csv', args.file)[0]
 
     print(json.dumps({
-        'Result': saveDf(df.replace({True: 1, False: 0}), f'{date}_result_{name}_{num}.csv'),
-        'CyGt': saveDf(dfcy, f'{date}_CyGt_{name}_{num}.csv'),
-        'CyLt': saveDf(dflt, f'{date}_CyLt_{name}_{num}.csv'),
-        'CyRt': saveDf(dfrt, f'{date}_CyRt_{name}_{num}.csv'),
-        'CyDb': saveDf(dfdb, f'{date}_CyDb_{name}_{num}.csv'),
+        'RsltCSV': saveDf(df.replace({True: 1, False: 0}), f'{date}_result_{name}_{num}.csv'),
+        'CyGtCSV': saveDf(dfcy, f'{date}_CyGt_{name}_{num}.csv'),
+        'CyLtCSV': saveDf(dflt, f'{date}_CyLt_{name}_{num}.csv'),
+        'CyRtCSV': saveDf(dfrt, f'{date}_CyRt_{name}_{num}.csv'),
+        'CyDbCSV': saveDf(dfdb, f'{date}_CyDb_{name}_{num}.csv'),
     }))
 
 if __name__ == "__main__":

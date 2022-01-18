@@ -3,22 +3,25 @@
 import argparse
 import json
 import pandas as pd
-# import numpy as np
+
+from pathlib import Path
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-r",
     type=int,
     nargs='+',
     action='append')
+parser.add_argument("-p", type=str, default="file/csv/")
 parser.add_argument("-f", type=str,)
 parser.add_argument("-c", type=str,)
+parser.add_argument("-s", type=str, default="file/csv/")
 
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    prefix = "file/csv/"
-    df = pd.read_csv(prefix+args.f)
-    cygt = pd.read_csv(prefix+ args.c)
+    df = pd.read_csv(Path(args.p)/args.f)
+    cygt = pd.read_csv(Path(args.p)/args.c)
     df = df[df.columns.drop(list(df.filter(regex='support')))] # drop by regex
 
     maxMean = pd.concat([
@@ -49,7 +52,7 @@ if __name__ == "__main__":
     result = pd.concat([pd.DataFrame({0: selection}, index=['Selection']),
                         concat_df])
     result = result.rename(columns={0: args.f})
-    result.to_csv(prefix +'result.csv')
+    result.to_csv(Path(args.s)/'result.csv')
     print(json.dumps({
-        'ExportFile': prefix +'result.csv'
+        'ExportFile': 'result.csv'
     }))
