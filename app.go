@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"server/handlers"
+	"server/app/handlers"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
