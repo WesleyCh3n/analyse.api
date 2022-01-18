@@ -12,7 +12,6 @@ parser.add_argument("-r",
     type=int,
     nargs='+',
     action='append')
-parser.add_argument("-p", type=str, default="file/csv/")
 parser.add_argument("-f", type=str,)
 parser.add_argument("-c", type=str,)
 parser.add_argument("-s", type=str, default="file/csv/")
@@ -20,8 +19,8 @@ parser.add_argument("-s", type=str, default="file/csv/")
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    df = pd.read_csv(Path(args.p)/args.f)
-    cygt = pd.read_csv(Path(args.p)/args.c)
+    df = pd.read_csv(args.f)
+    cygt = pd.read_csv(args.c)
     df = df[df.columns.drop(list(df.filter(regex='support')))] # drop by regex
 
     maxMean = pd.concat([
@@ -51,8 +50,8 @@ if __name__ == "__main__":
     concat_df = pd.concat([maxMean, minMean]).sort_index()
     result = pd.concat([pd.DataFrame({0: selection}, index=['Selection']),
                         concat_df])
-    result = result.rename(columns={0: args.f})
-    result.to_csv(Path(args.s)/'result.csv')
+    result = result.rename(columns={0: Path(args.f).stem})
+    result.to_csv(Path(args.s)/f"{Path(args.f).stem}-result.csv")
     print(json.dumps({
-        'ExportFile': 'result.csv'
+        'ExportFile': f"{Path(args.f).stem}-result.csv"
     }))

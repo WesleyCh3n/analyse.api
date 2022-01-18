@@ -9,7 +9,7 @@
 import pandas as pd
 import numpy as np
 import argparse
-import re
+# import re
 import json
 
 from pathlib import Path
@@ -57,16 +57,18 @@ def main():
 
     #=================================================================#
     # Export
-    date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
-    name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
-    num = re.findall(r'(\d+)\.csv', args.file)[0]
+    # {record_datetime}_{user_id}-{assistant_user_id}-{location}-{posture_id}-[{reason_id},{reason_id}]-{order}.csv
+    # 2021-01-09-20-14_48-8-2-1-[1,2]-1.csv
+    # date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
+    # name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
+    # num = re.findall(r'(\d+)\.csv', args.file)[0]
 
     print(json.dumps({
-        'RsltCSV': saveDf(df.replace({True: 1, False: 0}), f'{date}_result_{name}_{num}.csv'),
-        'CyGtCSV': saveDf(dfcy, f'{date}_CyGt_{name}_{num}.csv'),
-        'CyLtCSV': saveDf(dflt, f'{date}_CyLt_{name}_{num}.csv'),
-        'CyRtCSV': saveDf(dfrt, f'{date}_CyRt_{name}_{num}.csv'),
-        'CyDbCSV': saveDf(dfdb, f'{date}_CyDb_{name}_{num}.csv'),
+        'RsltCSV': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
+        'CyGtCSV': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
+        'CyLtCSV': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
+        'CyRtCSV': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
+        'CyDbCSV': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
     }))
 
 if __name__ == "__main__":

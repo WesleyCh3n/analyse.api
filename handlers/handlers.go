@@ -64,7 +64,8 @@ func UploadFile(c *fiber.Ctx) error {
 	// create meta data and send to client
 	data := map[string]interface{}{
 		"uploadFile": uploadFile,
-		"prefix":     fmt.Sprintf("%s/%s", serverRoot, saveDir),
+		"serverRoot": serverRoot,
+		"saveDir":    saveDir,
 		"python":     filteredData,
 	}
 
@@ -96,8 +97,43 @@ func Export(c *fiber.Ctx) error {
 	}
 
 	data := map[string]interface{}{
-		"prefix": fmt.Sprintf("%s/%s", serverRoot, saveDir),
-		"python": exportData,
+		"serverRoot": serverRoot,
+		"saveDir":    saveDir,
+		"python":     exportData,
+	}
+
+	return c.JSON(fiber.Map{
+		"status":  201,
+		"message": "Export complete",
+		"data":    data,
+	})
+}
+
+func Concat(c *fiber.Ctx) error {
+	result := ReqConcat{}
+
+	if err := c.BodyParser(&result); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	saveDir := "file/export"
+	mkDir(saveDir)
+	concatData, err := concatCsv(result, saveDir)
+
+	if err != nil {
+		log.Println("Python script error", err)
+		return c.JSON(fiber.Map{
+			"status":  500,
+			"message": "Sub process error",
+			"data":    err,
+		})
+	}
+
+	data := map[string]interface{}{
+		"serverRoot": serverRoot,
+		"saveDir":    saveDir,
+		"python":     concatData,
 	}
 
 	return c.JSON(fiber.Map{
