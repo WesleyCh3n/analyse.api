@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"server/app/handlers"
+	_ "server/docs"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -16,14 +18,15 @@ var (
 
 func setupRoutes(app *fiber.App) {
 	apiGroup := app.Group("/api")
-	apiGroup.Get("/ping", handlers.Pong)
-	apiGroup.Post("/upload", handlers.UploadFile)
+	apiGroup.Post("/upload", handlers.FilterData)
 	apiGroup.Post("/export", handlers.Export)
 	apiGroup.Post("/concat", handlers.Concat)
 
 	fileGroup := app.Group("/file")
 	fileGroup.Static("/csv", "./file/csv/")
 	fileGroup.Static("/export", "./file/export/")
+
+	app.Get("/swagger/*", swagger.HandlerDefault)
 }
 
 func NewServer() *fiber.App {
@@ -41,6 +44,19 @@ func NewServer() *fiber.App {
 	return app
 }
 
+// @title           analyze API
+// @version         1.0
+// @description     analyze python backend
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Wesley
+// @contact.email  wesley.ch3n.0530@gmail.com
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:3001
+// @BasePath  /
 func main() {
 	flag.Parse()
 

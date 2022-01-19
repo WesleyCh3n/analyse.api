@@ -9,6 +9,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Export godoc
+// @Summary      export selection files
+// @Tags Export
+// @Description  return processed selection csv
+// @ID           export_selection_file
+// @Accept       application/json
+// @Produce      application/json
+// @Param FltrFile body models.FltrFile true "filtered files"
+// @Param Range body []models.Range true "selected ranges"
+// @Success      201  {object}  models.ExportFile
+// @Router       /api/export [post]
 func Export(c *fiber.Ctx) error {
 	reqBody := struct {
 		Fltr  models.FltrFile `json:"FltrFile"`
@@ -57,6 +68,16 @@ func Export(c *fiber.Ctx) error {
 	})
 }
 
+// Concat godoc
+// @Summary      concat 2 selection csv
+// @Tags Concat
+// @Description  return concat selection csvs
+// @ID           concat_selection_file
+// @Accept       application/json
+// @Produce      application/json
+// @Param Files body []string true "files need to be concated"
+// @Success      201  {object}  models.ConcatFile
+// @Router       /api/concat [post]
 func Concat(c *fiber.Ctx) error {
 	reqBody := struct {
 		Files []string `json:"files"`

@@ -1,0 +1,124 @@
+basePath: /
+definitions:
+  models.ConcatFile:
+    properties:
+      ConcatFile:
+        type: string
+    type: object
+  models.ExportFile:
+    properties:
+      ExportFile:
+        type: string
+    type: object
+  models.FltrFile:
+    properties:
+      cyDb:
+        type: string
+      cyGt:
+        type: string
+      cyLt:
+        type: string
+      cyRt:
+        type: string
+      rslt:
+        type: string
+    type: object
+  models.Range:
+    properties:
+      end:
+        type: integer
+      start:
+        type: integer
+    type: object
+host: localhost:3001
+info:
+  contact:
+    email: wesley.ch3n.0530@gmail.com
+    name: Wesley
+  description: analyze python backend
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: analyze API
+  version: "1.0"
+paths:
+  /api/concat:
+    post:
+      consumes:
+      - application/json
+      description: return concat selection csvs
+      operationId: concat_selection_file
+      parameters:
+      - description: files need to be concated
+        in: body
+        name: Files
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ConcatFile'
+      summary: concat 2 selection csv
+      tags:
+      - Concat
+  /api/export:
+    post:
+      consumes:
+      - application/json
+      description: return processed selection csv
+      operationId: export_selection_file
+      parameters:
+      - description: filtered files
+        in: body
+        name: FltrFile
+        required: true
+        schema:
+          $ref: '#/definitions/models.FltrFile'
+      - description: selected ranges
+        in: body
+        name: Range
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Range'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ExportFile'
+      summary: export selection files
+      tags:
+      - Export
+  /api/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload raw csv and return filtered csvs
+      operationId: upload_create_filtered_data
+      parameters:
+      - description: Upload file
+        in: formData
+        name: file
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.FltrFile'
+      summary: Create filtered files
+      tags:
+      - Filter
+swagger: "2.0"

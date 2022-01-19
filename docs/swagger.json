@@ -1,0 +1,188 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "analyze python backend",
+        "title": "analyze API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Wesley",
+            "email": "wesley.ch3n.0530@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3001",
+    "basePath": "/",
+    "paths": {
+        "/api/concat": {
+            "post": {
+                "description": "return concat selection csvs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Concat"
+                ],
+                "summary": "concat 2 selection csv",
+                "operationId": "concat_selection_file",
+                "parameters": [
+                    {
+                        "description": "files need to be concated",
+                        "name": "Files",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConcatFile"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/export": {
+            "post": {
+                "description": "return processed selection csv",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Export"
+                ],
+                "summary": "export selection files",
+                "operationId": "export_selection_file",
+                "parameters": [
+                    {
+                        "description": "filtered files",
+                        "name": "FltrFile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FltrFile"
+                        }
+                    },
+                    {
+                        "description": "selected ranges",
+                        "name": "Range",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Range"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExportFile"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/upload": {
+            "post": {
+                "description": "upload raw csv and return filtered csvs",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filter"
+                ],
+                "summary": "Create filtered files",
+                "operationId": "upload_create_filtered_data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Upload file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.FltrFile"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ConcatFile": {
+            "type": "object",
+            "properties": {
+                "ConcatFile": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExportFile": {
+            "type": "object",
+            "properties": {
+                "ExportFile": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.FltrFile": {
+            "type": "object",
+            "properties": {
+                "cyDb": {
+                    "type": "string"
+                },
+                "cyGt": {
+                    "type": "string"
+                },
+                "cyLt": {
+                    "type": "string"
+                },
+                "cyRt": {
+                    "type": "string"
+                },
+                "rslt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Range": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer"
+                },
+                "start": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

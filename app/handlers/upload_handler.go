@@ -11,11 +11,17 @@ import (
 
 var serverRoot = "http://localhost:3001"
 
-func Pong(c *fiber.Ctx) error {
-	return c.Status(200).SendString("ok")
-}
-
-func UploadFile(c *fiber.Ctx) error {
+// FilterData godoc
+// @Summary      Create filtered files
+// @Tags Filter
+// @Description  upload raw csv and return filtered csvs
+// @ID           upload_create_filtered_data
+// @Accept       multipart/form-data
+// @Produce      application/json
+// @Param file formData string true "Upload file"
+// @Success      201  {object}  models.FltrFile
+// @Router       /api/upload [post]
+func FilterData(c *fiber.Ctx) error {
 
 	file, err := c.FormFile("file")
 	if err != nil {
