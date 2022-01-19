@@ -41,7 +41,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Concat"
+                    "Python"
                 ],
                 "summary": "concat 2 selection csv",
                 "operationId": "concat_selection_file",
@@ -79,7 +79,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Export"
+                    "Python"
                 ],
                 "summary": "export selection files",
                 "operationId": "export_selection_file",
@@ -126,7 +126,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Filter"
+                    "Python"
                 ],
                 "summary": "Create filtered files",
                 "operationId": "upload_create_filtered_data",
@@ -198,7 +198,13 @@ var doc = `{
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "running python process api",
+            "name": "Python"
+        }
+    ]
 }`
 
 type swaggerInfo struct {

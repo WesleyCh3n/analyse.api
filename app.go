@@ -49,6 +49,9 @@ func NewServer() *fiber.App {
 // @description     analyze python backend
 // @termsOfService  http://swagger.io/terms/
 
+// @tag.name         Python
+// @tag.description  running python process api
+
 // @contact.name   Wesley
 // @contact.email  wesley.ch3n.0530@gmail.com
 

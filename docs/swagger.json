@@ -27,7 +27,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Concat"
+                    "Python"
                 ],
                 "summary": "concat 2 selection csv",
                 "operationId": "concat_selection_file",
@@ -65,7 +65,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Export"
+                    "Python"
                 ],
                 "summary": "export selection files",
                 "operationId": "export_selection_file",
@@ -112,7 +112,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Filter"
+                    "Python"
                 ],
                 "summary": "Create filtered files",
                 "operationId": "upload_create_filtered_data",
@@ -184,5 +184,11 @@
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "running python process api",
+            "name": "Python"
+        }
+    ]
 }

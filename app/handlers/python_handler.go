@@ -11,14 +11,14 @@ import (
 
 // Export godoc
 // @Summary      export selection files
-// @Tags Export
+// @Tags         Python
 // @Description  return processed selection csv
 // @ID           export_selection_file
 // @Accept       application/json
 // @Produce      application/json
-// @Param FltrFile body models.FltrFile true "filtered files"
-// @Param Range body []models.Range true "selected ranges"
-// @Success      201  {object}  models.ExportFile
+// @Param        FltrFile  body      models.FltrFile  true  "filtered files"
+// @Param        Range     body      []models.Range   true  "selected ranges"
+// @Success      201       {object}  models.ExportFile
 // @Router       /api/export [post]
 func Export(c *fiber.Ctx) error {
 	reqBody := struct {
@@ -70,13 +70,13 @@ func Export(c *fiber.Ctx) error {
 
 // Concat godoc
 // @Summary      concat 2 selection csv
-// @Tags Concat
+// @Tags         Python
 // @Description  return concat selection csvs
 // @ID           concat_selection_file
 // @Accept       application/json
 // @Produce      application/json
-// @Param Files body []string true "files need to be concated"
-// @Success      201  {object}  models.ConcatFile
+// @Param        Files  body      []string  true  "files need to be concated"
+// @Success      201    {object}  models.ConcatFile
 // @Router       /api/concat [post]
 func Concat(c *fiber.Ctx) error {
 	reqBody := struct {

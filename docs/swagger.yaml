@@ -67,7 +67,7 @@ paths:
             $ref: '#/definitions/models.ConcatFile'
       summary: concat 2 selection csv
       tags:
-      - Concat
+      - Python
   /api/export:
     post:
       consumes:
@@ -98,7 +98,7 @@ paths:
             $ref: '#/definitions/models.ExportFile'
       summary: export selection files
       tags:
-      - Export
+      - Python
   /api/upload:
     post:
       consumes:
@@ -120,5 +120,8 @@ paths:
             $ref: '#/definitions/models.FltrFile'
       summary: Create filtered files
       tags:
-      - Filter
+      - Python
 swagger: "2.0"
+tags:
+- description: running python process api
+  name: Python

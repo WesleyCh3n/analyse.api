@@ -13,13 +13,13 @@ var serverRoot = "http://localhost:3001"
 
 // FilterData godoc
 // @Summary      Create filtered files
-// @Tags Filter
+// @Tags         Python
 // @Description  upload raw csv and return filtered csvs
 // @ID           upload_create_filtered_data
 // @Accept       multipart/form-data
 // @Produce      application/json
-// @Param file formData string true "Upload file"
-// @Success      201  {object}  models.FltrFile
+// @Param        file  formData  string  true  "Upload file"
+// @Success      201   {object}  models.FltrFile
 // @Router       /api/upload [post]
 func FilterData(c *fiber.Ctx) error {
 
