@@ -64,11 +64,11 @@ def main():
     # num = re.findall(r'(\d+)\.csv', args.file)[0]
 
     print(json.dumps({
-        'RsltCSV': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
-        'CyGtCSV': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
-        'CyLtCSV': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
-        'CyRtCSV': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
-        'CyDbCSV': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
+        'rslt': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
+        'cyGt': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
+        'cyLt': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
+        'cyRt': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
+        'cyDb': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
     }))
 
 if __name__ == "__main__":
