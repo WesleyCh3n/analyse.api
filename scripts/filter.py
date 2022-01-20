@@ -16,6 +16,7 @@ from pathlib import Path
 from numpy import array
 from module.preprocess import selectIndex, createSelectDF, convertMilliGToSI, separateSupportTime
 from module.cycle import createGaitCycleList, createCycleList
+from module.selection import check_selection_exist, add_selection_col, get_selection
 
 
 parser = argparse.ArgumentParser()
@@ -37,6 +38,10 @@ def saveDf(df, path):
     return str(path)
 
 def main():
+    if not check_selection_exist(args.file):
+        ranges = add_selection_col(args.file)
+    else:
+        ranges = get_selection(args.file)
     position = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
     sel_dict = selectIndex(position)
 
@@ -64,11 +69,14 @@ def main():
     # num = re.findall(r'(\d+)\.csv', args.file)[0]
 
     print(json.dumps({
-        'rslt': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
-        'cyGt': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
-        'cyLt': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
-        'cyRt': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
-        'cyDb': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
+        'FltrFile': {
+            'rslt': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
+            'cyGt': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
+            'cyLt': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
+            'cyRt': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
+            'cyDb': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
+        },
+        'Range': ranges,
     }))
 
 if __name__ == "__main__":

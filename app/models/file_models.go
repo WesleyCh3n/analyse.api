@@ -9,10 +9,14 @@ type FltrFile struct {
 }
 
 type Range struct {
-	Start int
-	End   int
+	Start float32 `json:"Start"`
+	End   float32 `json:"End"`
 }
 
+type Fltr struct {
+	Fltr  FltrFile `json:"FltrFile"`
+	Range []Range  `json:"Range"`
+}
 type ExportFile struct {
 	Path string `json:"ExportFile"`
 }

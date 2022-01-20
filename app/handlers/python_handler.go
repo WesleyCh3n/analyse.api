@@ -45,7 +45,7 @@ func Export(c *fiber.Ctx) error {
 	app := "./scripts/exporter.py"
 	args := []string{}
 	for _, r := range reqBody.Range {
-		args = append(args, "-r", strconv.Itoa(r.Start), strconv.Itoa(r.End))
+		args = append(args, "-r", strconv.Itoa(int(r.Start)), strconv.Itoa(int(r.End)))
 	}
 	args = append(args, "-f", reqBody.Fltr.Rslt, "-c", reqBody.Fltr.CyGt, "-s", saveDir)
 	if err := utils.CmdRunner(app, args, &exportFile); err != nil {
@@ -118,5 +118,35 @@ func Concat(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"msg":  "Concat successfully",
 		"data": data,
+	})
+}
+
+func SaveRange(c *fiber.Ctx) error {
+	reqBody := struct {
+		UploadFile string `json:"uploadFile"`
+		Range      string `json:"Range"`
+	}{}
+	if err := c.BodyParser(&reqBody); err != nil {
+		return err
+	}
+
+	// execute python
+	resp := struct {
+		Msg string `json:"msg"`
+	}{}
+	app := "./scripts/selection_writer.py"
+	args := []string{}
+	args = append(args, "-f", reqBody.UploadFile)
+	args = append(args, "-v", reqBody.Range)
+	if err := utils.CmdRunner(app, args, &resp); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"msg":  err.Error(),
+			"data": nil,
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"msg":  "Uploaded successfully",
+		"data": nil,
 	})
 }

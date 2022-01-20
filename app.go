@@ -21,6 +21,7 @@ func setupRoutes(app *fiber.App) {
 	apiGroup.Post("/upload", handlers.FilterData)
 	apiGroup.Post("/export", handlers.Export)
 	apiGroup.Post("/concat", handlers.Concat)
+	apiGroup.Patch("/save", handlers.SaveRange)
 
 	fileGroup := app.Group("/file")
 	fileGroup.Static("/csv", "./file/csv/")

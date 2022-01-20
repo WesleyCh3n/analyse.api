@@ -62,7 +62,7 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// execute python
-	fltrFile := models.FltrFile{}
+	fltrFile := models.Fltr{}
 	app := "./scripts/filter.py"
 	args := []string{"-f", filePath, "-s", saveDir}
 	if err := utils.CmdRunner(app, args, &fltrFile); err != nil {
