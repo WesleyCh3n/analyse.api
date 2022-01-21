@@ -19,13 +19,14 @@ var (
 func setupRoutes(app *fiber.App) {
 	apiGroup := app.Group("/api")
 	apiGroup.Post("/upload", handlers.FilterData)
-	apiGroup.Post("/export", handlers.Export)
-	apiGroup.Post("/concat", handlers.Concat)
+	apiGroup.Put("/export", handlers.Export)
+	apiGroup.Put("/concat", handlers.Concat)
 	apiGroup.Patch("/save", handlers.SaveRange)
 
 	fileGroup := app.Group("/file")
 	fileGroup.Static("/csv", "./file/csv/")
 	fileGroup.Static("/export", "./file/export/")
+	fileGroup.Static("/raw", "./file/raw/")
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 }
