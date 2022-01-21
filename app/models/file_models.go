@@ -1,11 +1,11 @@
 package models
 
 type FltrFile struct {
-	Rslt string `json:"rslt"`
-	CyGt string `json:"cyGt"`
-	CyLt string `json:"cyLt"`
-	CyRt string `json:"cyRt"`
-	CyDb string `json:"cyDb"`
+	Rslt string `json:"rslt" example:"rslt.csv"`
+	CyGt string `json:"cyGt" example:"cyGt.csv"`
+	CyLt string `json:"cyLt" example:"cyLt.csv"`
+	CyRt string `json:"cyRt" example:"cyRt.csv"`
+	CyDb string `json:"cyDb" example:"cyDb.csv"`
 }
 
 type Range struct {
@@ -18,7 +18,7 @@ type Fltr struct {
 	Range []Range  `json:"Range"`
 }
 type ExportFile struct {
-	Path string `json:"ExportFile"`
+	Path string `json:"ExportFile" example:"exportfile.csv"`
 }
 
 type ConcatFile struct {

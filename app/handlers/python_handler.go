@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"os"
+	"path"
 	"server/app/models"
 	"server/pkg/utils"
 	"strconv"
@@ -16,15 +17,12 @@ import (
 // @ID           export_selection_file
 // @Accept       application/json
 // @Produce      application/json
-// @Param        FltrFile  body      models.FltrFile  true  "filtered files"
-// @Param        Range     body      []models.Range   true  "selected ranges"
-// @Success      201       {object}  models.ExportFile
-// @Router       /api/export [post]
+// @Param        FltrFile    body      models.FltrFile  true  "filtered files"
+// @Param        RangeIndex  body      []models.Range   true  "selected ranges"
+// @Success      201         {object}  models.ResExport
+// @Router       /api/export [put]
 func Export(c *fiber.Ctx) error {
-	reqBody := struct {
-		Fltr  models.FltrFile `json:"FltrFile"`
-		Range []models.Range  `json:"Range"`
-	}{}
+	reqBody := models.ReqExport{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		return c.Status(fiber.StatusMethodNotAllowed).JSON(fiber.Map{
 			"msg":  "Invalid request input",
@@ -47,7 +45,10 @@ func Export(c *fiber.Ctx) error {
 	for _, r := range reqBody.Range {
 		args = append(args, "-r", strconv.Itoa(int(r.Start)), strconv.Itoa(int(r.End)))
 	}
-	args = append(args, "-f", reqBody.Fltr.Rslt, "-c", reqBody.Fltr.CyGt, "-s", saveDir)
+	args = append(args,
+		"-f", path.Join(fltrDir, reqBody.Fltr.Rslt),
+		"-c", path.Join(fltrDir, reqBody.Fltr.CyGt),
+		"-s", saveDir)
 	if err := utils.CmdRunner(app, args, &exportFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -56,10 +57,10 @@ func Export(c *fiber.Ctx) error {
 	}
 
 	// create meta data and send to client
-	data := map[string]interface{}{
-		"serverRoot": serverRoot,
-		"saveDir":    saveDir,
-		"python":     exportFile,
+	data := models.ResExport{
+		ServerRoot: serverRoot,
+		SaveDir:    saveDir,
+		Python:     exportFile,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -75,13 +76,11 @@ func Export(c *fiber.Ctx) error {
 // @ID           concat_selection_file
 // @Accept       application/json
 // @Produce      application/json
-// @Param        Files  body      []string  true  "files need to be concated"
-// @Success      201    {object}  models.ConcatFile
-// @Router       /api/concat [post]
+// @Param        files  body      []string  true  "files need to be concated"
+// @Success      201    {object}  models.ResConcat
+// @Router       /api/concat [put]
 func Concat(c *fiber.Ctx) error {
-	reqBody := struct {
-		Files []string `json:"files"`
-	}{}
+	reqBody := models.ReqConcat{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		return err
 	}
@@ -93,6 +92,8 @@ func Concat(c *fiber.Ctx) error {
 			"data": nil,
 		})
 	}
+	// TODO: concat output name
+	os.Remove("./file/export/concat.csv")
 
 	// execute python
 	concatFile := models.ConcatFile{}
@@ -109,10 +110,10 @@ func Concat(c *fiber.Ctx) error {
 		})
 	}
 
-	data := map[string]interface{}{
-		"serverRoot": serverRoot,
-		"saveDir":    saveDir,
-		"python":     concatFile,
+	data := models.ResConcat{
+		ServerRoot: serverRoot,
+		SaveDir:    saveDir,
+		Python:     concatFile,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -121,11 +122,19 @@ func Concat(c *fiber.Ctx) error {
 	})
 }
 
+// SaveRange godoc
+// @Summary      Save selected range in raw file
+// @Tags         Python
+// @Description  Save selected range in raw file
+// @ID           save_selected_range
+// @Accept       application/json
+// @Produce      application/json
+// @Param        UploadFile  body      string  true  "Original file"
+// @Param        Range       body      string  true  "range(string)  to  write  in  csv  column"
+// @Success      200         {object}  string  "Success message"
+// @Router       /api/save [patch]
 func SaveRange(c *fiber.Ctx) error {
-	reqBody := struct {
-		UploadFile string `json:"uploadFile"`
-		Range      string `json:"Range"`
-	}{}
+	reqBody := models.ReqSave{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		return err
 	}
@@ -136,7 +145,7 @@ func SaveRange(c *fiber.Ctx) error {
 	}{}
 	app := "./scripts/selection_writer.py"
 	args := []string{}
-	args = append(args, "-f", reqBody.UploadFile)
+	args = append(args, "-f", path.Join(uploadDir, reqBody.UploadFile))
 	args = append(args, "-v", reqBody.Range)
 	if err := utils.CmdRunner(app, args, &resp); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -145,7 +154,7 @@ func SaveRange(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg":  "Uploaded successfully",
 		"data": nil,
 	})

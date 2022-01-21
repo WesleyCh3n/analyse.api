@@ -11,6 +11,9 @@ import (
 
 var serverRoot = "http://localhost:3001"
 
+const fltrDir = "file/csv"
+const uploadDir = "file/raw"
+
 // FilterData godoc
 // @Summary      Create filtered files
 // @Tags         Python
@@ -19,7 +22,7 @@ var serverRoot = "http://localhost:3001"
 // @Accept       multipart/form-data
 // @Produce      application/json
 // @Param        file  formData  string  true  "Upload file"
-// @Success      201   {object}  models.FltrFile
+// @Success      201   {object}  models.ResUpload
 // @Router       /api/upload [post]
 func FilterData(c *fiber.Ctx) error {
 
@@ -35,7 +38,6 @@ func FilterData(c *fiber.Ctx) error {
 	uploadFile := file.Filename
 
 	// make upload directory
-	uploadDir := "file/raw"
 	if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -53,8 +55,7 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// make filtered files directory
-	saveDir := "file/csv"
-	if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(fltrDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -62,10 +63,10 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// execute python
-	fltrFile := models.Fltr{}
+	fltr := models.Fltr{}
 	app := "./scripts/filter.py"
-	args := []string{"-f", filePath, "-s", saveDir}
-	if err := utils.CmdRunner(app, args, &fltrFile); err != nil {
+	args := []string{"-f", filePath, "-s", fltrDir}
+	if err := utils.CmdRunner(app, args, &fltr); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -73,11 +74,17 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// create meta data and send to client
-	data := map[string]interface{}{
-		"uploadFile": uploadFile,
-		"serverRoot": serverRoot,
-		"saveDir":    saveDir,
-		"python":     fltrFile,
+	// data := map[string]interface{}{
+	// "uploadFile": uploadFile,
+	// "serverRoot": serverRoot,
+	// "saveDir":    fltrDir,
+	// "python":     fltrFile,
+	// }
+	data := models.ResUpload{
+		Upload:     uploadFile,
+		ServerRoot: serverRoot,
+		SaveDir:    fltrDir,
+		Python:     fltr,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
