@@ -32,7 +32,7 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/concat": {
-            "post": {
+            "put": {
                 "description": "return concat selection csvs",
                 "consumes": [
                     "application/json"
@@ -48,7 +48,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "files need to be concated",
-                        "name": "Files",
+                        "name": "files",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -63,14 +63,14 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ConcatFile"
+                            "$ref": "#/definitions/models.ResConcat"
                         }
                     }
                 }
             }
         },
         "/api/export": {
-            "post": {
+            "put": {
                 "description": "return processed selection csv",
                 "consumes": [
                     "application/json"
@@ -95,7 +95,7 @@ var doc = `{
                     },
                     {
                         "description": "selected ranges",
-                        "name": "Range",
+                        "name": "RangeIndex",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -110,7 +110,51 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ExportFile"
+                            "$ref": "#/definitions/models.ResExport"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/save": {
+            "patch": {
+                "description": "Save selected range in raw file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Python"
+                ],
+                "summary": "Save selected range in raw file",
+                "operationId": "save_selected_range",
+                "parameters": [
+                    {
+                        "description": "Original file",
+                        "name": "UploadFile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "range(string)  to  write  in  csv  column",
+                        "name": "Range",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -143,7 +187,7 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.FltrFile"
+                            "$ref": "#/definitions/models.ResUpload"
                         }
                     }
                 }
@@ -163,7 +207,22 @@ var doc = `{
             "type": "object",
             "properties": {
                 "ExportFile": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "exportfile.csv"
+                }
+            }
+        },
+        "models.Fltr": {
+            "type": "object",
+            "properties": {
+                "FltrFile": {
+                    "$ref": "#/definitions/models.FltrFile"
+                },
+                "Range": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Range"
+                    }
                 }
             }
         },
@@ -171,30 +230,87 @@ var doc = `{
             "type": "object",
             "properties": {
                 "cyDb": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cyDb.csv"
                 },
                 "cyGt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cyGt.csv"
                 },
                 "cyLt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cyLt.csv"
                 },
                 "cyRt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cyRt.csv"
                 },
                 "rslt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rslt.csv"
                 }
             }
         },
         "models.Range": {
             "type": "object",
             "properties": {
-                "end": {
-                    "type": "integer"
+                "End": {
+                    "type": "number"
                 },
-                "start": {
-                    "type": "integer"
+                "Start": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.ResConcat": {
+            "type": "object",
+            "properties": {
+                "python": {
+                    "$ref": "#/definitions/models.ConcatFile"
+                },
+                "saveDir": {
+                    "type": "string",
+                    "example": "file/example"
+                },
+                "serverRoot": {
+                    "type": "string",
+                    "example": "http://example.com:3000"
+                }
+            }
+        },
+        "models.ResExport": {
+            "type": "object",
+            "properties": {
+                "python": {
+                    "$ref": "#/definitions/models.ExportFile"
+                },
+                "saveDir": {
+                    "type": "string",
+                    "example": "file/example"
+                },
+                "serverRoot": {
+                    "type": "string",
+                    "example": "http://example.com:3000"
+                }
+            }
+        },
+        "models.ResUpload": {
+            "type": "object",
+            "properties": {
+                "python": {
+                    "$ref": "#/definitions/models.Fltr"
+                },
+                "saveDir": {
+                    "type": "string",
+                    "example": "file/example"
+                },
+                "serverRoot": {
+                    "type": "string",
+                    "example": "http://example.com:3000"
+                },
+                "uploadFile": {
+                    "type": "string",
+                    "example": "example_raw.csv"
                 }
             }
         }

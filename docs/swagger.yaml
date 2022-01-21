@@ -8,27 +8,78 @@ definitions:
   models.ExportFile:
     properties:
       ExportFile:
+        example: exportfile.csv
         type: string
+    type: object
+  models.Fltr:
+    properties:
+      FltrFile:
+        $ref: '#/definitions/models.FltrFile'
+      Range:
+        items:
+          $ref: '#/definitions/models.Range'
+        type: array
     type: object
   models.FltrFile:
     properties:
       cyDb:
+        example: cyDb.csv
         type: string
       cyGt:
+        example: cyGt.csv
         type: string
       cyLt:
+        example: cyLt.csv
         type: string
       cyRt:
+        example: cyRt.csv
         type: string
       rslt:
+        example: rslt.csv
         type: string
     type: object
   models.Range:
     properties:
-      end:
-        type: integer
-      start:
-        type: integer
+      End:
+        type: number
+      Start:
+        type: number
+    type: object
+  models.ResConcat:
+    properties:
+      python:
+        $ref: '#/definitions/models.ConcatFile'
+      saveDir:
+        example: file/example
+        type: string
+      serverRoot:
+        example: http://example.com:3000
+        type: string
+    type: object
+  models.ResExport:
+    properties:
+      python:
+        $ref: '#/definitions/models.ExportFile'
+      saveDir:
+        example: file/example
+        type: string
+      serverRoot:
+        example: http://example.com:3000
+        type: string
+    type: object
+  models.ResUpload:
+    properties:
+      python:
+        $ref: '#/definitions/models.Fltr'
+      saveDir:
+        example: file/example
+        type: string
+      serverRoot:
+        example: http://example.com:3000
+        type: string
+      uploadFile:
+        example: example_raw.csv
+        type: string
     type: object
 host: localhost:3001
 info:
@@ -44,7 +95,7 @@ info:
   version: "1.0"
 paths:
   /api/concat:
-    post:
+    put:
       consumes:
       - application/json
       description: return concat selection csvs
@@ -52,7 +103,7 @@ paths:
       parameters:
       - description: files need to be concated
         in: body
-        name: Files
+        name: files
         required: true
         schema:
           items:
@@ -64,12 +115,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.ConcatFile'
+            $ref: '#/definitions/models.ResConcat'
       summary: concat 2 selection csv
       tags:
       - Python
   /api/export:
-    post:
+    put:
       consumes:
       - application/json
       description: return processed selection csv
@@ -83,7 +134,7 @@ paths:
           $ref: '#/definitions/models.FltrFile'
       - description: selected ranges
         in: body
-        name: Range
+        name: RangeIndex
         required: true
         schema:
           items:
@@ -95,8 +146,37 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.ExportFile'
+            $ref: '#/definitions/models.ResExport'
       summary: export selection files
+      tags:
+      - Python
+  /api/save:
+    patch:
+      consumes:
+      - application/json
+      description: Save selected range in raw file
+      operationId: save_selected_range
+      parameters:
+      - description: Original file
+        in: body
+        name: UploadFile
+        required: true
+        schema:
+          type: string
+      - description: range(string)  to  write  in  csv  column
+        in: body
+        name: Range
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            type: string
+      summary: Save selected range in raw file
       tags:
       - Python
   /api/upload:
@@ -117,7 +197,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.FltrFile'
+            $ref: '#/definitions/models.ResUpload'
       summary: Create filtered files
       tags:
       - Python
