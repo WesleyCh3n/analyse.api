@@ -2,19 +2,21 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"os/exec"
 )
 
 func CmdRunner(app string, args []string, result interface{}) error {
 	cmd := exec.Command(app, args...)
 
-	stdout, err := cmd.Output()
-	// fmt.Print(string(stdout))
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		log.Print(string(out))
+		return errors.New(string(out))
 	}
 
-	json.Unmarshal(stdout, &result)
+	json.Unmarshal(out, &result)
 
 	return err
 }
