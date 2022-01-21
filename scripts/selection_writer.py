@@ -23,6 +23,4 @@ if __name__ == "__main__":
             "msg": "Success",
         }))
     except Exception as e:
-        print(json.dumps({
-            "msg": f'{e}',
-        }))
+        raise e
