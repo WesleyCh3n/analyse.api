@@ -6,11 +6,13 @@ on:
 jobs:
   web:
     runs-on: ubuntu-latest
+    env:
+      WEB_DIR: web
     steps:
     - uses: actions/checkout@v2
     - name: clone front
       run: |
-        git clone https://github.com/WesleyCh3n/analyse.d3.web
+        git clone https://github.com/WesleyCh3n/analyse.d3.web ${{ env.WEB_DIR }}
     - uses: actions/setup-node@v2
       with:
         node-version: '17'
@@ -18,19 +20,20 @@ jobs:
       run: npm install -g yarn
     - name: install dependancy
       run: |
-        cd analyse.d3.web
+        cd ${{ env.WEB_DIR }}
         yarn install
     - name: export web
       run: |
-        cd analyse.d3.web
-        ls
+        cd ${{ env.WEB_DIR }}
         yarn export
-        
 
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v2
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: ls
+      run: |
+        ls
 
 #     - name: Set up Go
 #       uses: actions/setup-go@v2
