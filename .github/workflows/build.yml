@@ -22,8 +22,10 @@ jobs:
         yarn install
     - name: export web
       run: |
-        yarn export
+        cd analyse.d3.web
         ls
+        yarn export
+        
 
 #   build:
 #     runs-on: ubuntu-latest
