@@ -41,7 +41,7 @@ func NewServer() *fiber.App {
 
 	setupRoutes(app)
 
-	// app.Static("/", *staticFile) // if serve static web
+	app.Static("/", *staticFile) // if serve static web
 
 	return app
 }
