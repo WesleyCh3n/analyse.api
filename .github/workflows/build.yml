@@ -13,13 +13,17 @@ jobs:
         git clone https://github.com/WesleyCh3n/analyse.d3.web
     - uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '17'
     - name: install yarn
       run: npm install -g yarn
     - name: install dependancy
       run: |
         cd analyse.d3.web
         yarn install
+    - name: export web
+      run: |
+        yarn export
+        ls
 
 #   build:
 #     runs-on: ubuntu-latest
