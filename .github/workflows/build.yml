@@ -1,0 +1,38 @@
+name: build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: clone front
+      run: |
+        git clone https://github.com/WesleyCh3n/analyse.d3.web
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: install yarn
+      run: npm install -g yarn
+    - name: install dependancy
+      run: |
+        cd analyse.d3.web
+        yarn install
+
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+
+#     - name: Set up Go
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: 1.17
+
+#     - name: Build
+#       run: go build -v ./...
+
+#     - name: Test
+#       run: go test -v ./...
