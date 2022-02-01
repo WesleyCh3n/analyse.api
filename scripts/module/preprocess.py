@@ -9,8 +9,8 @@ def selectIndex(position):
     sel_dict = {
         # init index
         'time': 'time', # time index
-        'Noraxon MyoMotion-Segments-Foot RT-Contact': 'RT_contact', # R contact index
-        'Noraxon MyoMotion-Segments-Foot LT-Contact': 'LT_contact', # L contact index
+        'RT Contact': 'RT_contact', # R contact index
+        'LT Contact': 'LT_contact', # L contact index
     }
     for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3): # HACK: zip repeat:
         # Acceleration [XYZ]

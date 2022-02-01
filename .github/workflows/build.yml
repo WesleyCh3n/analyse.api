@@ -51,4 +51,5 @@ jobs:
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
       run: |
-        docker push $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}
+        echo $(date +%Y%m%d-%H%M%S)
+        # docker push $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}
