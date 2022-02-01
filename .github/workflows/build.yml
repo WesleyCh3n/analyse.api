@@ -50,6 +50,9 @@ jobs:
     - name: docker push
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      uses: szenius/set-timezone@v1.0
+      with:
+        timezoneLinux: "Asia/Taipei"
       run: |
         echo $(date +%Y%m%d-%H%M%S)
         # docker push $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}
