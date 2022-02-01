@@ -40,7 +40,7 @@ jobs:
       run: |
         docker build --build-arg WEB_DIR=${{ env.WEB_DIR }} \
                      -f ./docker/Dockerfile \
-                     -t $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }} \
+                     -t $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}.$(date +%Y%m%d-%H%M%S) \
                      ./
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
