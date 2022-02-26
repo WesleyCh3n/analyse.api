@@ -16,7 +16,7 @@ from pathlib import Path
 from numpy import array
 from module.preprocess import selectIndex, createSelectDF, convertMilliGToSI, separateSupportTime
 from module.cycle import createGaitCycleList, createCycleList
-from module.selection import check_selection_exist, add_selection_col, get_selection
+from module.selection import check_selection_exist, check_value_exist, add_selection_col, get_selection
 
 
 parser = argparse.ArgumentParser()
@@ -41,11 +41,14 @@ def main():
     if not check_selection_exist(args.file):
         ranges = add_selection_col(args.file)
     else:
-        ranges = get_selection(args.file)
+        if check_value_exist(args.file):
+            ranges = get_selection(args.file)
+        else:
+            ranges = []
     position = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
-    sel_dict = selectIndex(position)
 
     raw_data = pd.read_csv(args.file, skiprows=array([0,1,2]), low_memory=False)
+    sel_dict = selectIndex(raw_data.columns)
     df = createSelectDF(raw_data, sel_dict) # select columns
 
     a_label_mG = [f'{pos}_A_{ax}_mG' for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3)]

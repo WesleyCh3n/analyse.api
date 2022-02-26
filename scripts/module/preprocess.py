@@ -1,23 +1,51 @@
 #!/usr/bin/env python3
 
 import pandas as pd
-import numpy as np
-from numpy import array
 
-def selectIndex(position):
+def get_basic_dict(cols):
+    remap_dict = dict()
+    remap_dict['time'] = 'time'
+    for col in cols:
+        if 'Contact' in col:
+            if 'Foot LT' in col:
+                remap_dict[col] = 'LT_contact'
+            elif 'Foot RT' in col:
+                remap_dict[col] = 'RT_contact'
+            elif '脚 左' in col:
+                remap_dict[col] = 'LT_contact'
+            elif '脚 右' in col:
+                remap_dict[col] = 'RT_contact'
+    return remap_dict
+
+def get_pos_dict(en, ch, cols):
+    remap_dict = dict()
+    for col in cols:
+        if en in col or ch in col:
+            if ' Accel ' in col:
+                if ' X ' in col:
+                    remap_dict[col] = f'{en}_A_X_mG'
+                if ' Y ' in col:
+                    remap_dict[col] = f'{en}_A_Y_mG'
+                if ' Z ' in col:
+                    remap_dict[col] = f'{en}_A_Z_mG'
+            if '-Gyroscope-' in col:
+                if '-x ' in col:
+                    remap_dict[col] = f'{en}_Gyro_X'
+                if '-y ' in col:
+                    remap_dict[col] = f'{en}_Gyro_Y'
+                if '-z ' in col:
+                    remap_dict[col] = f'{en}_Gyro_Z'
+    return(remap_dict)
+
+def selectIndex(cols):
     # [time, [LR] contact, [position] accel/gyro]
-    sel_dict = {
-        # init index
-        'time': 'time', # time index
-        'RT Contact': 'RT_contact', # R contact index
-        'LT Contact': 'LT_contact', # L contact index
-    }
-    for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3): # HACK: zip repeat:
-        # Acceleration [XYZ]
-        sel_dict[f'{pos} Accel Sensor {ax} (mG)'] = f'{pos}_A_{ax}_mG'
-        # Gyroscope [XYZ]
-        sel_dict[f'Noraxon MyoMotion-Segments-{pos}-Gyroscope-{ax.lower()} (deg/s)'] = f'{pos}_Gyro_{ax}'
-    return sel_dict
+    remap_dict = {}
+    remap_dict.update(get_pos_dict('Pelvis', '骨盆', cols))
+    remap_dict.update(get_pos_dict('Upper spine', '脊椎上部', cols))
+    remap_dict.update(get_pos_dict('Lower spine', '脊椎下部', cols))
+    remap_dict.update(get_pos_dict('Head', '头部', cols))
+    remap_dict.update(get_basic_dict(cols))
+    return remap_dict
 
 def createSelectDF(df, sel_dict: dict) -> pd.DataFrame:
     """
@@ -27,6 +55,7 @@ def createSelectDF(df, sel_dict: dict) -> pd.DataFrame:
   }
   """
     selected_df = df[list(sel_dict.keys())].rename(columns=sel_dict)
+
     selected_df[['RT_contact', 'LT_contact']] = selected_df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
     return selected_df
 
