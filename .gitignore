@@ -3,3 +3,4 @@ file/*
 out
 tmp/*
 *.pyc
+*.csv

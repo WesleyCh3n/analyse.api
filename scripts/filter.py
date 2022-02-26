@@ -1,22 +1,40 @@
 #!/usr/bin/env python3
 
-# purpose: python3 main.py -f <file.csv> -s <out dir>
-# output:
-#   1. support + acceleration.csv
-#   3. cycle.csv
-
+# purpose:
+#   create preprocess node's 6 axis data, cycle data, preselected range.
+# usage: python3 filter.py -f <file.csv> -s <out dir>
+# example: python3 filter.py -f ../file/raw/v3.18.10-en-sample.csv -s ./tmp
+# example output:
+# {
+#   "FltrFile": {
+#     "rslt": "v3.18.10-en-sample-0.csv",
+#     "cyGt": "v3.18.10-en-sample-1.csv",
+#     "cyLt": "v3.18.10-en-sample-2.csv",
+#     "cyRt": "v3.18.10-en-sample-3.csv",
+#     "cyDb": "v3.18.10-en-sample-4.csv"
+#   },
+#   "Range": []
+# }
 
 import pandas as pd
-import numpy as np
 import argparse
-# import re
 import json
 
 from pathlib import Path
 from numpy import array
-from module.preprocess import selectIndex, createSelectDF, convertMilliGToSI, separateSupportTime
+from module.selection import (
+    check_selection_exist,
+    check_value_exist,
+    add_selection_col,
+    get_selection
+)
+from module.preprocess import (
+    selectIndex,
+    createSelectDF,
+    convertMilliGToSI,
+    separateSupportTime
+)
 from module.cycle import createGaitCycleList, createCycleList
-from module.selection import check_selection_exist, check_value_exist, add_selection_col, get_selection
 
 
 parser = argparse.ArgumentParser()
@@ -30,14 +48,17 @@ parser.add_argument("-s",
 args = parser.parse_args()
 
 def saveDf(df, path):
+    # mkdir
+    Path(args.save).mkdir(exist_ok=True)
     try:
         df.to_csv(Path(args.save)/path, index=False)
     except:
-        return "Error"
+        return "Error: create csv failed"
 
     return str(path)
 
 def main():
+    # checking header selection section
     if not check_selection_exist(args.file):
         ranges = add_selection_col(args.file)
     else:
@@ -45,17 +66,12 @@ def main():
             ranges = get_selection(args.file)
         else:
             ranges = []
-    position = ['Pelvis', 'Lower spine', 'Upper spine', 'Head']
 
     raw_data = pd.read_csv(args.file, skiprows=array([0,1,2]), low_memory=False)
     sel_dict = selectIndex(raw_data.columns)
-    df = createSelectDF(raw_data, sel_dict) # select columns
-
-    a_label_mG = [f'{pos}_A_{ax}_mG' for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3)]
-    a_label_SI = [f'{pos}_A_{ax}' for pos, ax in zip(np.repeat(array(position), 3), ['X','Y','Z'] * 3)]
-    df = convertMilliGToSI(df, a_label_mG, a_label_SI)
+    df = createSelectDF(raw_data, sel_dict)
+    df = convertMilliGToSI(df)
     df = separateSupportTime(df)
-    df = df.drop(columns=a_label_mG + ['RT_contact', 'LT_contact']) # drop unnecessary columns
 
     # create cycle list
     _, dfcy = createGaitCycleList(df, 'double_support')
@@ -65,22 +81,18 @@ def main():
 
     #=================================================================#
     # Export
-    # {record_datetime}_{user_id}-{assistant_user_id}-{location}-{posture_id}-[{reason_id},{reason_id}]-{order}.csv
-    # 2021-01-09-20-14_48-8-2-1-[1,2]-1.csv
-    # date = re.findall(r'\d+-\d+-\d+-\d+-\d+', args.file)[0]
-    # name = re.findall(r'motion_(.*)_\d{4}.\d{2}.\d{2}', args.file)[0]
-    # num = re.findall(r'(\d+)\.csv', args.file)[0]
-
+    in_filename = Path(args.file).stem
     print(json.dumps({
         'FltrFile': {
-            'rslt': saveDf(df.replace({True: 1, False: 0}), f"{Path(args.file).stem}-0.csv"),
-            'cyGt': saveDf(dfcy, f"{Path(args.file).stem}-1.csv"),
-            'cyLt': saveDf(dflt, f"{Path(args.file).stem}-2.csv"),
-            'cyRt': saveDf(dfrt, f"{Path(args.file).stem}-3.csv"),
-            'cyDb': saveDf(dfdb, f"{Path(args.file).stem}-4.csv"),
+            'rslt': saveDf(df.replace({True: 1, False: 0}),
+                           f"{in_filename}-0.csv"),
+            'cyGt': saveDf(dfcy, f"{in_filename}-1.csv"),
+            'cyLt': saveDf(dflt, f"{in_filename}-2.csv"),
+            'cyRt': saveDf(dfrt, f"{in_filename}-3.csv"),
+            'cyDb': saveDf(dfdb, f"{in_filename}-4.csv"),
         },
         'Range': ranges,
-    }))
+    }, indent=2))
 
 if __name__ == "__main__":
     main()

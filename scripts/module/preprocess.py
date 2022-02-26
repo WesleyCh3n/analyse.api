@@ -38,7 +38,7 @@ def get_pos_dict(en, ch, cols):
     return(remap_dict)
 
 def selectIndex(cols):
-    # [time, [LR] contact, [position] accel/gyro]
+    # dict: key->old_name, value->new_name
     remap_dict = {}
     remap_dict.update(get_pos_dict('Pelvis', '骨盆', cols))
     remap_dict.update(get_pos_dict('Upper spine', '脊椎上部', cols))
@@ -49,22 +49,25 @@ def selectIndex(cols):
 
 def createSelectDF(df, sel_dict: dict) -> pd.DataFrame:
     """
-  sel_dict: {
-    'time': 'time',
-    'original_index_name': 'perfered_index_name',
-  }
-  """
+    sel_dict: {
+      'time': 'time',
+      'original_index_name': 'perfered_index_name',
+    }
+    """
     selected_df = df[list(sel_dict.keys())].rename(columns=sel_dict)
-
-    selected_df[['RT_contact', 'LT_contact']] = selected_df[['RT_contact', 'LT_contact']].replace({1000: True, 0: False})
+    selected_df[['RT_contact', 'LT_contact']] = selected_df[[
+        'RT_contact', 'LT_contact'
+    ]].replace({1000: True, 0: False})
     return selected_df
 
-def convertMilliGToSI(df, index: list, out_index: list) -> pd.DataFrame:
+def convertMilliGToSI(df) -> pd.DataFrame:
     factor = 9.80665 * 10**(-3)
-    for i, o in zip(index, out_index):
-        df[o] = df[i] * factor
-        if 'x' in i:
-            df[o] = df[i] * factor - 9.80665
+    for col in df.columns:
+        if 'mG' in col:
+            df[col] = (
+                df[col] * factor if '_X_' not in col
+                else df[col] * factor - 9.80665)
+            df.rename(columns={col: col.replace('_mG', '')}, inplace=True)
     return df
 
 def separateSupportTime(df):
@@ -72,5 +75,7 @@ def separateSupportTime(df):
     df['single_support'] = ~df['double_support']
     df['RT_single_support'] = df['RT_contact'] & df['single_support']
     df['LT_single_support'] = df['LT_contact'] & df['single_support']
+
+    df = df.drop(columns=['RT_contact', 'LT_contact'])
 
     return df
