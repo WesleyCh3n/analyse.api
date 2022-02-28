@@ -1,40 +1,37 @@
 #!/usr/bin/env python3
-
-# purpose:
-#   create preprocess node's 6 axis data, cycle data, preselected range.
-# usage: python3 filter.py -f <file.csv> -s <out dir>
-# example: python3 filter.py -f ../file/raw/v3.18.10-en-sample.csv -s ./tmp
-# example output:
-# {
-#   "FltrFile": {
-#     "rslt": "v3.18.10-en-sample-0.csv",
-#     "cyGt": "v3.18.10-en-sample-1.csv",
-#     "cyLt": "v3.18.10-en-sample-2.csv",
-#     "cyRt": "v3.18.10-en-sample-3.csv",
-#     "cyDb": "v3.18.10-en-sample-4.csv"
-#   },
-#   "Range": []
-# }
-
-import pandas as pd
+"""
+purpose:
+  create preprocess node's 6 axis data, cycle data, preselected range.
+usage: python3 filter.py -f <file.csv> -s <out dir>
+example: python3 filter.py -f ../file/raw/v3.18.10-en-sample.csv -s ./tmp
+example output:
+{
+  "FltrFile": {
+    "rslt": "v3.18.10-en-sample-0.csv",
+    "cyGt": "v3.18.10-en-sample-1.csv",
+    "cyLt": "v3.18.10-en-sample-2.csv",
+    "cyRt": "v3.18.10-en-sample-3.csv",
+    "cyDb": "v3.18.10-en-sample-4.csv"
+  },
+  "Range": []
+}
+"""
 import argparse
+import pandas as pd
 import json
 
 from pathlib import Path
 from numpy import array
-from module.selection import (
-    check_selection_exist,
-    check_value_exist,
-    add_selection_col,
-    get_selection
-)
-from module.preprocess import (
-    selectIndex,
-    createSelectDF,
-    convertMilliGToSI,
-    separateSupportTime
-)
+
 from module.cycle import createGaitCycleList, createCycleList
+from module.preprocess import selectIndex
+from module.preprocess import createSelectDF
+from module.preprocess import convertMilliGToSI
+from module.preprocess import separateSupportTime
+from module.selection import check_selection_exist
+from module.selection import check_value_exist
+from module.selection import add_selection_col
+from module.selection import get_selection
 
 
 parser = argparse.ArgumentParser()
