@@ -33,7 +33,7 @@ def create_selection_mask(df, dfcy):
     mask = []
     for (a, b) in args.r:
         s_time, e_time = dfcy.start[a], dfcy.start[b]
-        mask.append(df['start'].between(s_time, e_time))
+        mask.append(df['start'].between(s_time, e_time, inclusive="left"))
     return mask
 
 if __name__ == "__main__":
