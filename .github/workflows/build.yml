@@ -61,3 +61,6 @@ jobs:
       run: |
         echo ${{ steps.date.outputs.date }}
         docker push $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}.${{ steps.date.outputs.date }}
+        # latest tag
+        docker tag $DOCKER_USER/analyse:gait-analyse.${{ env.VERSION }}.${{ steps.date.outputs.date }} $DOCKER_USER/analyse:latest
+        docker push $DOCKER_USER/analyse:latest
