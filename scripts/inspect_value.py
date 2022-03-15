@@ -15,10 +15,10 @@ from module.preprocess import separateSupportTime
 
 # file = '../file/raw/v3.18.10-en-sample.csv'
 
-paths = list(Path('../file/raw').iterdir())
+dir = '../file/raw'
 dgs = []
 
-for file in tqdm(paths):
+for file in tqdm(list(Path(dir).iterdir())):
     raw_data = pd.read_csv(file, skiprows=np.array([0,1,2]), low_memory=False)
     sel_dict = selectIndex(raw_data.columns)
     df = createSelectDF(raw_data, sel_dict)
@@ -38,5 +38,6 @@ for file in tqdm(paths):
 
 
 dgs_all = pd.concat(dgs)
-sns.scatterplot(data=dgs_all, x='step', y='Pelvis_A_X', hue='file')
+fig, ax = plt.subplots()
+sns.scatterplot(data=dgs_all, x='step', y='Pelvis_A_X', hue='file', ax=ax)
 plt.show()
