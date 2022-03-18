@@ -35,24 +35,22 @@ from module.selection import get_selection
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-f",
-    "--file",
-    type=str)
-parser.add_argument("-s",
-    "--save",
-    type=str)
+parser.add_argument("-f", "--file", type=str)
+parser.add_argument("-s", "--save", type=str)
 
 args = parser.parse_args()
+
 
 def saveDf(df, path):
     # mkdir
     Path(args.save).mkdir(exist_ok=True)
     try:
-        df.to_csv(Path(args.save)/path, index=False)
+        df.to_csv(Path(args.save) / path, index=False)
     except:
         return "Error: create csv failed"
 
     return str(path)
+
 
 def main():
     # checking header selection section
@@ -64,32 +62,41 @@ def main():
         else:
             ranges = []
 
-    raw_data = pd.read_csv(args.file, skiprows=array([0,1,2]), low_memory=False)
+    raw_data = pd.read_csv(
+        args.file, skiprows=array([0, 1, 2]), low_memory=False
+    )
     sel_dict = selectIndex(raw_data.columns)
     df = createSelectDF(raw_data, sel_dict)
     df = convertMilliGToSI(df)
     df = separateSupportTime(df)
 
     # create cycle list
-    _, dfcy = createGaitCycleList(df, 'double_support')
-    _, dflt = createCycleList(df, 'LT_single_support')
-    _, dfrt = createCycleList(df, 'RT_single_support')
-    _, dfdb = createCycleList(df, 'double_support')
+    _, dfcy = createGaitCycleList(df, "double_support")
+    _, dflt = createCycleList(df, "LT_single_support")
+    _, dfrt = createCycleList(df, "RT_single_support")
+    _, dfdb = createCycleList(df, "double_support")
 
-    #=================================================================#
+    # ================================================================= #
     # Export
     in_filename = Path(args.file).stem
-    print(json.dumps({
-        'FltrFile': {
-            'rslt': saveDf(df.replace({True: 1, False: 0}),
-                           f"{in_filename}-0.csv"),
-            'cyGt': saveDf(dfcy, f"{in_filename}-1.csv"),
-            'cyLt': saveDf(dflt, f"{in_filename}-2.csv"),
-            'cyRt': saveDf(dfrt, f"{in_filename}-3.csv"),
-            'cyDb': saveDf(dfdb, f"{in_filename}-4.csv"),
-        },
-        'Range': ranges,
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "FltrFile": {
+                    "rslt": saveDf(
+                        df.replace({True: 1, False: 0}), f"{in_filename}-0.csv"
+                    ),
+                    "cyGt": saveDf(dfcy, f"{in_filename}-1.csv"),
+                    "cyLt": saveDf(dflt, f"{in_filename}-2.csv"),
+                    "cyRt": saveDf(dfrt, f"{in_filename}-3.csv"),
+                    "cyDb": saveDf(dfdb, f"{in_filename}-4.csv"),
+                },
+                "Range": ranges,
+            },
+            indent=2,
+        )
+    )
+
 
 if __name__ == "__main__":
     main()
