@@ -18,7 +18,8 @@ dir = "../file/raw"
 dgs = []
 
 for file in tqdm(list(Path(dir).iterdir())):
-    raw_data = pd.read_csv(file, skiprows=np.array([0, 1, 2]), low_memory=False)
+    raw_data = pd.read_csv(
+        file, skiprows=np.array([0, 1, 2]), low_memory=False)
     sel_dict = selectIndex(raw_data.columns)
     df = createSelectDF(raw_data, sel_dict)
     df = convertMilliGToSI(df)
@@ -31,7 +32,8 @@ for file in tqdm(list(Path(dir).iterdir())):
         df.loc[(start <= df["time"]) & (df["time"] < end), ["step"]] = i
 
     df = df.dropna()
-    dg = df.groupby(["step"])["Pelvis_A_X"].agg(np.ptp).to_frame().reset_index()
+    dg = df.groupby(["step"])["Pelvis_A_X"].agg(
+        np.ptp).to_frame().reset_index()
     dg["file"] = file.stem
     dgs.append(dg)
 
@@ -39,4 +41,11 @@ for file in tqdm(list(Path(dir).iterdir())):
 dgs_all = pd.concat(dgs)
 fig, ax = plt.subplots()
 sns.scatterplot(data=dgs_all, x="step", y="Pelvis_A_X", hue="file", ax=ax)
+
+# Shrink current axis by 20%
+box = ax.get_position()
+ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+ax.set_ylabel("Pelvis A X (Max - Min)")
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 plt.show()
