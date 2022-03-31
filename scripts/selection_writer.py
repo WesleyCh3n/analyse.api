@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# python ./scripts/selection_writer.py \
+#    -f ./file/raw/v3.18.44-en-sample.csv -v "123123 1231 123 12"
 
 import argparse
 import json
@@ -132,8 +134,9 @@ if __name__ == "__main__":
 
         cols = raw_data.columns
         remap_d = get_remap_dict(cols)
-        # print(json.dumps(remap_dict, indent=2, ensure_ascii=False))
-        # print(f"{len(remap_dict)=}")
+        with open("map.json", "w") as f:
+            json.dump(remap_d, f, indent=2, ensure_ascii=False)
+
         clean_df = raw_data[list(remap_d.keys())].rename(columns=remap_d)
         clean_df.to_csv(save_file, index=False)
 
