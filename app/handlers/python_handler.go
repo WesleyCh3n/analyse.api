@@ -141,7 +141,9 @@ func SaveRange(c *fiber.Ctx) error {
 
 	// execute python
 	resp := struct {
-		Msg string `json:"msg"`
+		Msg        string `json:"msg"`
+		CleanFile  string `json:"clean_file"`
+		ServerRoot string
 	}{}
 	app := "./scripts/selection_writer.py"
 	args := []string{}
@@ -153,9 +155,10 @@ func SaveRange(c *fiber.Ctx) error {
 			"data": nil,
 		})
 	}
+	resp.ServerRoot = serverRoot
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg":  "Uploaded successfully",
-		"data": nil,
+		"data": resp,
 	})
 }

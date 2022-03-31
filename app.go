@@ -27,6 +27,7 @@ func setupRoutes(app *fiber.App) {
 	fileGroup.Static("/csv", "./file/csv/")
 	fileGroup.Static("/export", "./file/export/")
 	fileGroup.Static("/raw", "./file/raw/")
+	fileGroup.Static("/cleaning", "./file/cleaning/")
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 }

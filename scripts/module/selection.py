@@ -35,10 +35,10 @@ def update_value(file: str, value: str):
         nd_arr = contents[1].split(b",")
         if len(nd_arr) != 14:
             nd_arr[-1] = nd_arr[-1][:-2]
-            nd_arr.append(f"{value}\r\n".encode("utf-8"))
+            nd_arr.append(f"\"{value}\"\r\n".encode("utf-8"))
         elif len(nd_arr) == 14:
             nd_arr = nd_arr[:-1]
-            nd_arr.append(f"{value}\r\n".encode("utf-8"))
+            nd_arr.append(f"\"{value}\"\r\n".encode("utf-8"))
         contents[1] = b",".join(nd_arr)
         f.seek(0, 0)
         f.writelines(contents)
@@ -58,7 +58,7 @@ def get_selection(file: str):
 def add_selection_col(file: str):
     with open(file, mode="r+b") as f:
         contents = f.readlines()
-        contents[0] = contents[0][:-2] + b",selection\r\n"
+        contents[0] = contents[0][:-2] + b",\"selection\"\r\n"
         f.seek(0, 0)
         f.writelines(contents)
         return []
