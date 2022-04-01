@@ -134,8 +134,8 @@ if __name__ == "__main__":
 
         cols = raw_data.columns
         remap_d = get_remap_dict(cols)
-        with open("map.json", "w") as f:
-            json.dump(remap_d, f, indent=2, ensure_ascii=False)
+        # with open("map.json", "w") as f:
+        # json.dump(remap_d, f, indent=2, ensure_ascii=False)
 
         clean_df = raw_data[list(remap_d.keys())].rename(columns=remap_d)
         clean_df.to_csv(save_file, index=False)
