@@ -117,6 +117,10 @@ if __name__ == "__main__":
     dfcy_mean = pd.DataFrame(
         {0: (df_filter.end - df_filter.start).mean()}, index=["gait"]
     )
+    dfss_mean = pd.DataFrame(
+        {0: (dflt_mean.iloc[0, 0] + dfrt_mean.iloc[0, 0])},
+        index=["single_support"]
+    )
 
     # concat min max's mean
     concat_df = pd.concat([maxMean, minMean]).sort_index()
@@ -127,7 +131,8 @@ if __name__ == "__main__":
     df_selection = pd.DataFrame({0: selection}, index=["Selection"])
     # concat all df
     result = pd.concat(
-        [df_selection, dfcy_mean, dflt_mean, dfrt_mean, dfdb_mean, concat_df]
+        [df_selection, dfcy_mean, dflt_mean, dfrt_mean, dfss_mean, dfdb_mean,
+            concat_df]
     )
     result = result.rename(columns={0: Path(args.f).stem})
     result.to_csv(Path(args.s) / f"{Path(args.f).stem}-result.csv")
