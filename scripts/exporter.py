@@ -18,31 +18,17 @@ from pathlib import Path
 
 from module.cycle import createGaitCycleList, createCycleList
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-r", type=int, nargs="+", action="append")
-parser.add_argument(
-    "-f",
-    type=str,
-)
-parser.add_argument(
-    "-c",
-    type=str,
-)  # TODO: unused, remove this arg
-parser.add_argument("-s", type=str, default="file/csv/")
 
-args = parser.parse_args()
-
-
-def create_selection_mask(df, dfcy):
+def create_selection_mask(df, dfcy, walk_range: list):
     mask = []
-    for (a, b) in args.r:
+    for (a, b) in walk_range:
         s_time, e_time = dfcy.start[a], dfcy.start[b]
         mask.append(df["start"].between(s_time, e_time, inclusive="left"))
     return mask
 
 
-if __name__ == "__main__":
-    df = pd.read_csv(args.f)
+def export(file: str, save_dir: str, walk_range: list):
+    df = pd.read_csv(file)
     # dfcy = pd.read_csv(args.c)
 
     # HACK: hard code read lt/rt/db file
@@ -65,7 +51,7 @@ if __name__ == "__main__":
                         for i in range(r[0], r[1])
                     ]
                 )
-                for r in args.r
+                for r in walk_range
             ]
         )
         .mean()
@@ -86,7 +72,7 @@ if __name__ == "__main__":
                         for i in range(r[0], r[1])
                     ]
                 )
-                for r in args.r
+                for r in walk_range
             ]
         )
         .mean()
@@ -95,24 +81,24 @@ if __name__ == "__main__":
         .rename(index=lambda s: s + "_min")
     )
 
-    mask = create_selection_mask(dflt, dfcy)
+    mask = create_selection_mask(dflt, dfcy, walk_range)
     df_filter = dflt[reduce(lambda x, y: x | y, mask)]
     dflt_mean = pd.DataFrame(
         {0: (df_filter.end - df_filter.start).mean()},
         index=["LT_single_support"],
     )
-    mask = create_selection_mask(dfrt, dfcy)
+    mask = create_selection_mask(dfrt, dfcy, walk_range)
     df_filter = dfrt[reduce(lambda x, y: x | y, mask)]
     dfrt_mean = pd.DataFrame(
         {0: (df_filter.end - df_filter.start).mean()},
         index=["RT_single_support"],
     )
-    mask = create_selection_mask(dfdb, dfcy)
+    mask = create_selection_mask(dfdb, dfcy, walk_range)
     df_filter = dfdb[reduce(lambda x, y: x | y, mask)]
     dfdb_mean = pd.DataFrame(
         {0: (df_filter.end - df_filter.start).mean()}, index=["double_support"]
     )
-    mask = create_selection_mask(dfcy, dfcy)
+    mask = create_selection_mask(dfcy, dfcy, walk_range)
     df_filter = dfcy[reduce(lambda x, y: x | y, mask)]
     dfcy_mean = pd.DataFrame(
         {0: (df_filter.end - df_filter.start).mean()}, index=["gait"]
@@ -126,7 +112,7 @@ if __name__ == "__main__":
     concat_df = pd.concat([maxMean, minMean]).sort_index()
     # selection range
     selection = " ".join(
-        [f"{dfcy.start[r[0]]}-{dfcy.start[r[1]]}" for r in args.r]
+        [f"{dfcy.start[r[0]]}-{dfcy.start[r[1]]}" for r in walk_range]
     )
     df_selection = pd.DataFrame({0: selection}, index=["Selection"])
     # concat all df
@@ -134,8 +120,25 @@ if __name__ == "__main__":
         [df_selection, dfcy_mean, dflt_mean, dfrt_mean, dfss_mean, dfdb_mean,
             concat_df]
     )
-    result = result.rename(columns={0: Path(args.f).stem})
-    result.to_csv(Path(args.s) / f"{Path(args.f).stem}-result.csv")
+    result = result.rename(columns={0: Path(file).stem})
+    result.to_csv(Path(save_dir) / f"{Path(file).stem}-result.csv")
     print(
-        json.dumps({"ExportFile": f"{Path(args.f).stem}-result.csv"}, indent=2)
+        json.dumps({"ExportFile": f"{Path(file).stem}-result.csv"}, indent=2)
     )
+
+
+if __name__ == "__main__":
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-r", type=int, nargs="+", action="append")
+    # parser.add_argument(
+    #     "-f",
+    #     type=str,
+    # )
+    # parser.add_argument(
+    #     "-c",
+    #     type=str,
+    # )  # TODO: unused, remove this arg
+    # parser.add_argument("-s", type=str, default="file/csv/")
+    #
+    # args = parser.parse_args()
+    export()

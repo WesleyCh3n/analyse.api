@@ -2,7 +2,7 @@
 # python ./scripts/selection_writer.py \
 #    -f ./file/raw/v3.18.44-en-sample.csv -v "123123 1231 123 12"
 
-import argparse
+# import argparse
 import json
 from pathlib import Path
 import shutil
@@ -104,17 +104,11 @@ def get_remap_dict(cols):
     return d
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", type=str)
-parser.add_argument("-v", "--value", type=str)
-
-args = parser.parse_args()
-
-if __name__ == "__main__":
+def sel_writer(file: str, range_value: str):
     save_dir = Path("./file/cleaning/")
     save_dir.mkdir(exist_ok=True)
     try:
-        orig_file = Path(args.file)
+        orig_file = Path(file)
         save_file = save_dir.joinpath(orig_file.name)
 
         # copy file
@@ -122,10 +116,10 @@ if __name__ == "__main__":
 
         # check selection column exist
         if not check_selection_exist(save_file):
-            ranges = add_selection_col(save_file)
+            _ = add_selection_col(save_file)
 
         # update selection value
-        header = get_header(save_file, args.value)
+        header = get_header(save_file, range_value)
         # remove name and last name
 
         raw_data = pd.read_csv(
@@ -152,3 +146,13 @@ if __name__ == "__main__":
         )
     except Exception as e:
         raise e
+
+
+if __name__ == "__main__":
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-f", "--file", type=str)
+    # parser.add_argument("-v", "--value", type=str)
+    #
+    # args = parser.parse_args()
+
+    sel_writer()

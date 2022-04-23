@@ -34,36 +34,30 @@ from module.selection import add_selection_col
 from module.selection import get_selection
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", type=str)
-parser.add_argument("-s", "--save", type=str)
-
-args = parser.parse_args()
-
-
-def saveDf(df, path):
+def saveDf(df, save_dir, path):
     # mkdir
-    Path(args.save).mkdir(exist_ok=True)
-    try:
-        df.to_csv(Path(args.save) / path, index=False)
-    except:
-        return "Error: create csv failed"
+    Path(save_dir).mkdir(exist_ok=True)
+    df.to_csv(Path(save_dir) / path, index=False)
+    # try:
+    #     df.to_csv(Path(save_dir) / path, index=False)
+    # finally:
+    #     return "Error: create csv failed"
 
     return str(path)
 
 
-def main():
+def filter(file: str, save_dir: str):
     # checking header selection section
-    if not check_selection_exist(args.file):
-        ranges = add_selection_col(args.file)
+    if not check_selection_exist(file):
+        ranges = add_selection_col(file)
     else:
-        if check_value_exist(args.file):
-            ranges = get_selection(args.file)
+        if check_value_exist(file):
+            ranges = get_selection(file)
         else:
             ranges = []
 
     raw_data = pd.read_csv(
-        args.file, skiprows=array([0, 1, 2]), low_memory=False
+        file, skiprows=array([0, 1, 2]), low_memory=False
     )
     sel_dict = selectIndex(raw_data.columns)
     df = createSelectDF(raw_data, sel_dict)
@@ -78,18 +72,18 @@ def main():
 
     # ================================================================= #
     # Export
-    in_filename = Path(args.file).stem
+    in_filename = Path(file).stem
     print(
         json.dumps(
             {
                 "FltrFile": {
                     "rslt": saveDf(
-                        df.replace({True: 1, False: 0}), f"{in_filename}-0.csv"
+                        df.replace({True: 1, False: 0}), save_dir, f"{in_filename}-0.csv"
                     ),
-                    "cyGt": saveDf(dfcy, f"{in_filename}-1.csv"),
-                    "cyLt": saveDf(dflt, f"{in_filename}-2.csv"),
-                    "cyRt": saveDf(dfrt, f"{in_filename}-3.csv"),
-                    "cyDb": saveDf(dfdb, f"{in_filename}-4.csv"),
+                    "cyGt": saveDf(dfcy, save_dir, f"{in_filename}-1.csv"),
+                    "cyLt": saveDf(dflt, save_dir, f"{in_filename}-2.csv"),
+                    "cyRt": saveDf(dfrt, save_dir, f"{in_filename}-3.csv"),
+                    "cyDb": saveDf(dfdb, save_dir, f"{in_filename}-4.csv"),
                 },
                 "Range": ranges,
             },
@@ -99,4 +93,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--file", type=str)
+    parser.add_argument("-s", "--save", type=str)
+
+    args = parser.parse_args()
+
+    filter()
