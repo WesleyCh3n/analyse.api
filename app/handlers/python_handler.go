@@ -40,7 +40,7 @@ func Export(c *fiber.Ctx) error {
 
 	// execute python
 	exportFile := models.ExportFile{}
-	app := "./scripts/main.py"
+	app := "./py/main"
 	args := []string{"export"}
 	for _, r := range reqBody.Range {
 		args = append(args, "-r", strconv.Itoa(int(r.Start)), strconv.Itoa(int(r.End)))
@@ -96,7 +96,7 @@ func Concat(c *fiber.Ctx) error {
 
 	// execute python
 	concatFile := models.ConcatFile{}
-	app := "./scripts/main.py"
+	app := "./py/main"
 	args := []string{"concat", "-f"}
 	for _, r := range reqBody.Files {
 		args = append(args, r)
@@ -144,7 +144,7 @@ func SaveRange(c *fiber.Ctx) error {
 		CleanFile  string `json:"clean_file"`
 		ServerRoot string
 	}{}
-	app := "./scripts/main.py"
+	app := "./py/main"
 	args := []string{"swrite"}
 	args = append(args, "-f", path.Join(uploadDir, reqBody.UploadFile))
 	args = append(args, "-v", reqBody.Range)
