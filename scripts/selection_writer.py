@@ -5,7 +5,7 @@
 # import argparse
 import json
 from pathlib import Path
-import shutil
+# import shutil
 import pandas as pd
 import numpy as np
 
@@ -112,7 +112,8 @@ def sel_writer(file: str, range_value: str):
         save_file = save_dir.joinpath(orig_file.name)
 
         # copy file
-        shutil.copy(orig_file, save_file)
+        # shutil.copy(orig_file, save_file)
+        save_file.write_bytes(orig_file.read_bytes())
 
         # check selection column exist
         if not check_selection_exist(save_file):

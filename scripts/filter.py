@@ -16,7 +16,7 @@ example output:
   "Range": []
 }
 """
-import argparse
+# import argparse
 import pandas as pd
 import json
 
@@ -92,11 +92,11 @@ def filter(file: str, save_dir: str):
     )
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--file", type=str)
-    parser.add_argument("-s", "--save", type=str)
-
-    args = parser.parse_args()
-
-    filter()
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("-f", "--file", type=str)
+#     parser.add_argument("-s", "--save", type=str)
+#
+#     args = parser.parse_args()
+#
+#     filter()

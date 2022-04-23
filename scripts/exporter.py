@@ -2,14 +2,16 @@
 """
 purpose:
   export selection result
-usage: python3 exporter.py -r cycle.start cycle.start -f <position file> -c <gait result> -s <out dir>
-example: python3 exporter.py -r 1 11 -f tmp/v3.18.10-en-sample-0.csv -c tmp/v3.18.10-en-sample-1.csv -s result
+usage: python3 exporter.py -r cycle.start cycle.start -f <position file> -c \
+    <gait result> -s <out dir>
+example: python3 exporter.py -r 1 11 -f tmp/v3.18.10-en-sample-0.csv -c \
+    tmp/v3.18.10-en-sample-1.csv -s result
 example output:
 {
   "ExportFile": "v3.18.10-en-sample-0-result.csv"
 }
 """
-import argparse
+# import argparse
 from functools import reduce
 import json
 import pandas as pd
@@ -44,7 +46,11 @@ def export(file: str, save_dir: str, walk_range: list):
             [
                 pd.concat(
                     [
-                        df[df["time"].between(dfcy.start[i], dfcy.start[i + 1])]
+                        df[
+                            df["time"].between(
+                                dfcy.start[i], dfcy.start[i + 1]
+                            )
+                        ]
                         .max()
                         .to_frame()
                         .T
@@ -65,7 +71,11 @@ def export(file: str, save_dir: str, walk_range: list):
             [
                 pd.concat(
                     [
-                        df[df["time"].between(dfcy.start[i], dfcy.start[i + 1])]
+                        df[
+                            df["time"].between(
+                                dfcy.start[i], dfcy.start[i + 1]
+                            )
+                        ]
                         .min()
                         .to_frame()
                         .T
@@ -105,7 +115,7 @@ def export(file: str, save_dir: str, walk_range: list):
     )
     dfss_mean = pd.DataFrame(
         {0: (dflt_mean.iloc[0, 0] + dfrt_mean.iloc[0, 0])},
-        index=["single_support"]
+        index=["single_support"],
     )
 
     # concat min max's mean
@@ -117,8 +127,15 @@ def export(file: str, save_dir: str, walk_range: list):
     df_selection = pd.DataFrame({0: selection}, index=["Selection"])
     # concat all df
     result = pd.concat(
-        [df_selection, dfcy_mean, dflt_mean, dfrt_mean, dfss_mean, dfdb_mean,
-            concat_df]
+        [
+            df_selection,
+            dfcy_mean,
+            dflt_mean,
+            dfrt_mean,
+            dfss_mean,
+            dfdb_mean,
+            concat_df,
+        ]
     )
     result = result.rename(columns={0: Path(file).stem})
     result.to_csv(Path(save_dir) / f"{Path(file).stem}-result.csv")
@@ -127,18 +144,18 @@ def export(file: str, save_dir: str, walk_range: list):
     )
 
 
-if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-r", type=int, nargs="+", action="append")
-    # parser.add_argument(
-    #     "-f",
-    #     type=str,
-    # )
-    # parser.add_argument(
-    #     "-c",
-    #     type=str,
-    # )  # TODO: unused, remove this arg
-    # parser.add_argument("-s", type=str, default="file/csv/")
-    #
-    # args = parser.parse_args()
-    export()
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("-r", type=int, nargs="+", action="append")
+#     parser.add_argument(
+#         "-f",
+#         type=str,
+#     )
+#     parser.add_argument(
+#         "-c",
+#         type=str,
+#     )  # TODO: unused, remove this arg
+#     parser.add_argument("-s", type=str, default="file/csv/")
+#
+#     args = parser.parse_args()
+#     export()

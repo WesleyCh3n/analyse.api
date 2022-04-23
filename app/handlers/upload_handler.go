@@ -65,7 +65,7 @@ func FilterData(c *fiber.Ctx) error {
 	// execute python
 	fltr := models.Fltr{}
 	app := "./scripts/main.py"
-	args := []string{"-t", "filter", "-f", filePath, "-s", fltrDir}
+	args := []string{"filter", "-f", filePath, "-s", fltrDir}
 	if err := utils.CmdRunner(app, args, &fltr); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),

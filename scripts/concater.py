@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse
+# import argparse
 import json
 import pandas as pd
 
@@ -12,14 +12,14 @@ def concat(files: list, save_dir: str):
     df.to_csv(Path(save_dir) / "concat.csv")
     print(json.dumps({"ConcatFile": "concat.csv"}))
 
-if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument(
-    #     "-f",
-    #     type=str,
-    #     nargs="+",
-    # )
-    # parser.add_argument("-s", type=str, default="file/export/")
-    #
-    # args = parser.parse_args()
-    concat()
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument(
+#         "-f",
+#         type=str,
+#         nargs="+",
+#     )
+#     parser.add_argument("-s", type=str, default="file/export/")
+#
+#     args = parser.parse_args()
+#     concat()
