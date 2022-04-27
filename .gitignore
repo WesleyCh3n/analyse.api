@@ -5,4 +5,6 @@ out
 tmp/*
 *.pyc
 *.csv
+!assets/*
 venv
+bin/*

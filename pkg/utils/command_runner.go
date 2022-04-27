@@ -11,8 +11,9 @@ func CmdRunner(app string, args []string, result interface{}) error {
 	cmd := exec.Command(app, args...)
 
 	out, err := cmd.CombinedOutput()
+	log.Println(app, args)
+	log.Println(string(out))
 	if err != nil {
-		log.Print(string(out))
 		return errors.New(string(out))
 	}
 

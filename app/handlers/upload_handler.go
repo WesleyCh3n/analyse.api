@@ -11,6 +11,7 @@ import (
 
 var serverRoot = "http://localhost:3001"
 
+const analyzeExe = "./bin/analyze_polars"
 const fltrDir = "file/csv"
 const uploadDir = "file/raw"
 
@@ -64,7 +65,7 @@ func FilterData(c *fiber.Ctx) error {
 
 	// execute python
 	fltr := models.Fltr{}
-	app := "./py/main"
+	app := analyzeExe
 	args := []string{"filter", "-f", filePath, "-s", fltrDir}
 	if err := utils.CmdRunner(app, args, &fltr); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

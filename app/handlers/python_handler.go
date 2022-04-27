@@ -139,25 +139,28 @@ func SaveRange(c *fiber.Ctx) error {
 	}
 
 	// execute python
-	resp := struct {
-		Msg        string `json:"msg"`
-		CleanFile  string `json:"clean_file"`
-		ServerRoot string
-	}{}
-	app := "./py/main"
+	saveDir := "file/cleaning"
+	cleanFile := models.CleanFile{}
+	app := analyzeExe
 	args := []string{"swrite"}
 	args = append(args, "-f", path.Join(uploadDir, reqBody.UploadFile))
+	args = append(args, "-s", saveDir)
 	args = append(args, "-v", reqBody.Range)
-	if err := utils.CmdRunner(app, args, &resp); err != nil {
+	if err := utils.CmdRunner(app, args, &cleanFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
 		})
 	}
-	resp.ServerRoot = serverRoot
+
+	data := models.ResClean{
+		ServerRoot: serverRoot,
+		SaveDir:    saveDir,
+		Python:     cleanFile,
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg":  "Uploaded successfully",
-		"data": resp,
+		"data": data,
 	})
 }

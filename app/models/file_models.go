@@ -24,3 +24,7 @@ type ExportFile struct {
 type ConcatFile struct {
 	Path string `json:"ConcatFile"`
 }
+
+type CleanFile struct {
+	Path string `json:"CleanFile"`
+}
