@@ -40,14 +40,15 @@ func Export(c *fiber.Ctx) error {
 
 	// execute python
 	exportFile := models.ExportFile{}
-	app := "./py/main"
+	app := analyzeExe
 	args := []string{"export"}
-	for _, r := range reqBody.Range {
-		args = append(args, "-r", strconv.Itoa(int(r.Start)), strconv.Itoa(int(r.End)))
-	}
 	args = append(args,
 		"-f", path.Join(fltrDir, reqBody.Fltr.Rslt),
 		"-s", saveDir)
+	for _, r := range reqBody.Range {
+		args = append(args, "-r",
+			strconv.Itoa(int(r.Start))+" "+strconv.Itoa(int(r.End)))
+	}
 	if err := utils.CmdRunner(app, args, &exportFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -96,10 +97,10 @@ func Concat(c *fiber.Ctx) error {
 
 	// execute python
 	concatFile := models.ConcatFile{}
-	app := "./py/main"
-	args := []string{"concat", "-f"}
+	app := analyzeExe
+	args := []string{"concat"}
 	for _, r := range reqBody.Files {
-		args = append(args, r)
+		args = append(args, "-f", r)
 	}
 	args = append(args, "-s", saveDir)
 	if err := utils.CmdRunner(app, args, &concatFile); err != nil {
