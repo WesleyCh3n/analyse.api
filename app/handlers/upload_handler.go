@@ -3,8 +3,8 @@ package handlers
 import (
 	"fmt"
 	"os"
-	"server/app/models"
-	"server/pkg/utils"
+	"analyze.api/app/models"
+	"analyze.api/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

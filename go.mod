@@ -1,4 +1,4 @@
-module server
+module analyze.api
 
 go 1.17
 

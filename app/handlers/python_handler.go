@@ -3,8 +3,8 @@ package handlers
 import (
 	"os"
 	"path"
-	"server/app/models"
-	"server/pkg/utils"
+	"analyze.api/app/models"
+	"analyze.api/pkg/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
