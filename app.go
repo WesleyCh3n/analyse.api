@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"analyze.api/app/handlers"
 	_ "analyze.api/docs"
 
@@ -11,9 +12,9 @@ import (
 )
 
 var (
-	port       = flag.String("port", ":3000", "Port to listen on")
-	prod       = flag.Bool("prod", false, "Enable prefork in Production")
-	staticFile = flag.String("d", "./static/build/", "static web folder")
+	port       = flag.String("port", ":3001", "Port to listen on")
+	prod       = flag.Bool("prod", true, "Enable prefork in Production")
+	staticFile = flag.String("d", "./asset/front/", "static web folder")
 )
 
 func setupRoutes(app *fiber.App) {
@@ -35,6 +36,7 @@ func setupRoutes(app *fiber.App) {
 func NewServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		BodyLimit: 100 * 1024 * 1024, // 100 mb
+		Prefork:   *prod,
 	})
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://localhost:3000", // cross origin
