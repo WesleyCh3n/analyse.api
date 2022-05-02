@@ -3,14 +3,15 @@ package handlers
 import (
 	"fmt"
 	"os"
-	"server/app/models"
-	"server/pkg/utils"
+	"analyze.api/app/models"
+	"analyze.api/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 var serverRoot = "http://localhost:3001"
 
+const analyzeExe = "./bin/analyze_polars"
 const fltrDir = "file/csv"
 const uploadDir = "file/raw"
 
@@ -64,8 +65,8 @@ func FilterData(c *fiber.Ctx) error {
 
 	// execute python
 	fltr := models.Fltr{}
-	app := "./scripts/filter.py"
-	args := []string{"-f", filePath, "-s", fltrDir}
+	app := analyzeExe
+	args := []string{"filter", "-f", filePath, "-s", fltrDir}
 	if err := utils.CmdRunner(app, args, &fltr); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),

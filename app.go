@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"server/app/handlers"
-	_ "server/docs"
+	"analyze.api/app/handlers"
+	_ "analyze.api/docs"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"

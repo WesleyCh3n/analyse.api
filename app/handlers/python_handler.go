@@ -3,8 +3,8 @@ package handlers
 import (
 	"os"
 	"path"
-	"server/app/models"
-	"server/pkg/utils"
+	"analyze.api/app/models"
+	"analyze.api/pkg/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,15 +40,15 @@ func Export(c *fiber.Ctx) error {
 
 	// execute python
 	exportFile := models.ExportFile{}
-	app := "./scripts/exporter.py"
-	args := []string{}
-	for _, r := range reqBody.Range {
-		args = append(args, "-r", strconv.Itoa(int(r.Start)), strconv.Itoa(int(r.End)))
-	}
+	app := analyzeExe
+	args := []string{"export"}
 	args = append(args,
 		"-f", path.Join(fltrDir, reqBody.Fltr.Rslt),
-		"-c", path.Join(fltrDir, reqBody.Fltr.CyGt),
 		"-s", saveDir)
+	for _, r := range reqBody.Range {
+		args = append(args, "-r",
+			strconv.Itoa(int(r.Start))+" "+strconv.Itoa(int(r.End)))
+	}
 	if err := utils.CmdRunner(app, args, &exportFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -97,10 +97,10 @@ func Concat(c *fiber.Ctx) error {
 
 	// execute python
 	concatFile := models.ConcatFile{}
-	app := "./scripts/concater.py"
-	args := []string{"-f"}
+	app := analyzeExe
+	args := []string{"concat"}
 	for _, r := range reqBody.Files {
-		args = append(args, r)
+		args = append(args, "-f", r)
 	}
 	args = append(args, "-s", saveDir)
 	if err := utils.CmdRunner(app, args, &concatFile); err != nil {
@@ -140,25 +140,28 @@ func SaveRange(c *fiber.Ctx) error {
 	}
 
 	// execute python
-	resp := struct {
-		Msg        string `json:"msg"`
-		CleanFile  string `json:"clean_file"`
-		ServerRoot string
-	}{}
-	app := "./scripts/selection_writer.py"
-	args := []string{}
+	saveDir := "file/cleaning"
+	cleanFile := models.CleanFile{}
+	app := analyzeExe
+	args := []string{"swrite"}
 	args = append(args, "-f", path.Join(uploadDir, reqBody.UploadFile))
+	args = append(args, "-s", saveDir)
 	args = append(args, "-v", reqBody.Range)
-	if err := utils.CmdRunner(app, args, &resp); err != nil {
+	if err := utils.CmdRunner(app, args, &cleanFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
 		})
 	}
-	resp.ServerRoot = serverRoot
+
+	data := models.ResClean{
+		ServerRoot: serverRoot,
+		SaveDir:    saveDir,
+		Python:     cleanFile,
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg":  "Uploaded successfully",
-		"data": resp,
+		"data": data,
 	})
 }

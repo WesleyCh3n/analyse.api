@@ -18,3 +18,9 @@ type ResConcat struct {
 	SaveDir    string     `json:"saveDir" example:"file/example"`
 	Python     ConcatFile `json:"python"`
 }
+
+type ResClean struct {
+	ServerRoot string    `json:"serverRoot" example:"http://example.com:3000"`
+	SaveDir    string    `json:"saveDir" example:"file/example"`
+	Python     CleanFile `json:"python"`
+}
