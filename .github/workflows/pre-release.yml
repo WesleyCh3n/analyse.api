@@ -56,11 +56,19 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-apple-darwin.tar
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: actions/download-artifact@master
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          name: ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-unknown-linux-gnu.tar
+      - uses: actions/download-artifact@master
+        with:
+          name: ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-pc-windows-msvc.zip
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"
           files: |
             ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-apple-darwin.tar
+            ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-unknown-linux-gnu.tar
+            ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-pc-windows-msvc.zip
