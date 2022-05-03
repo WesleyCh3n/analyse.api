@@ -1,10 +1,10 @@
 .ropeproject
 .DS_Store
+
 file/*
-out
 tmp/*
-*.pyc
-*.csv
-!assets/*
-venv
+
+assets/*
 bin/*
+
+*.csv
