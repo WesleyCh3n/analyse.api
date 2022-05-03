@@ -31,8 +31,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: get repo name
-        run: echo ::set-env name=REPO_NAME::${{ github.event.repository.name }}
+      - id: get_repository_name
+        run: echo ::set-output name=REPO_NAME::${{ github.event.repository.name }}
+        shell: bash
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -43,31 +44,32 @@ jobs:
         run: |
           ${{ matrix.comp_type }} \
             ${{ matrix.comp_args }} \
-            ${{ env.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }} \
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }} \
             analyze.api${{ matrix.suffix }}
           ls
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.REPO_NAME }}-${{ matrix.target }}
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-${{ matrix.target }}
           path: |
-            ${{ env.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }}
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }}
   pre-release:
     needs: build
     name: "Pre-release"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: get repo name
-        run: echo ::set-env name=REPO_NAME::${{ github.event.repository.name }}
+      - id: get_repository_name
+        run: echo ::set-output name=REPO_NAME::${{ github.event.repository.name }}
+        shell: bash
       - uses: actions/download-artifact@master
         with:
-          name: ${{ env.REPO_NAME }}-x86_64-apple-darwin.tar
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin.tar
       - uses: actions/download-artifact@master
         with:
-          name: ${{ env.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
       - uses: actions/download-artifact@master
         with:
-          name: ${{ env.REPO_NAME }}-x86_64-pc-windows-msvc.zip
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-pc-windows-msvc.zip
       - uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -75,6 +77,6 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            ${{ env.REPO_NAME }}-x86_64-apple-darwin.tar
-            ${{ env.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
-            ${{ env.REPO_NAME }}-x86_64-pc-windows-msvc.zip
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin.tar
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-pc-windows-msvc.zip
