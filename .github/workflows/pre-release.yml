@@ -7,20 +7,26 @@ on:
       - "main"
 
 jobs:
-  pre-release:
-    name: "Pre Release"
+  build:
+    name: "Build"
     strategy:
       matrix:
         include:
           - os: macos-latest
             target: x86_64-apple-darwin
             suffix: ''
+            comp_type: tar
+            comp_args: -cvf
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
+            comp_type: tar
+            comp_args: -cvf
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             suffix: .exe
+            comp_type: zip
+            comp_args: ''
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -31,6 +37,25 @@ jobs:
           go-version: 1.17
       - name: Build
         run: go build
+      - name: Compress things up
+        run: |
+          ${{ matrix.comp_type }} \
+            ${{ matrix.comp_args }} \
+            ${{ GITHUB_ACTION_REPOSITORY }}-${{ matrix.target }}.${{ matrix.comp_type }} \
+            analyze.api${{ matrix.suffix }}
+          ls
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ GITHUB_ACTION_REPOSITORY }}-${{ matrix.target }}
+          path: |
+            ${{ GITHUB_ACTION_REPOSITORY }}-${{ matrix.target }}.${{ matrix.comp_type }}
+  pre-release:
+    name: "Pre-release"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-apple-darwin.tar
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -38,4 +63,4 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            analyze.api${{ matrix.suffix }}
+            ${{ GITHUB_ACTION_REPOSITORY }}-x86_64-apple-darwin.tar
