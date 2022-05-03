@@ -10,11 +10,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var serverRoot = "http://localhost:3001"
-
-const analyzeExe = "./bin/analyze_polars"
-const fltrDir = "file/csv"
-const uploadDir = "file/raw"
+var serverRoot = "http://localhost:" + os.Getenv("PORT")
+var analyzeExe = os.Getenv("ANALYZE_EXE")
+var rawDir = os.Getenv("FILTER_DIR")
+var filterDir = os.Getenv("RAW_DIR")
+var exportDir = os.Getenv("EXPORT_DIR")
+var cleanDir = os.Getenv("CLEAN_DIR")
 
 // FilterData godoc
 // @Summary      Create filtered files
@@ -40,7 +41,7 @@ func FilterData(c *fiber.Ctx) error {
 	uploadFile := file.Filename
 
 	// make upload directory
-	if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(rawDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -48,7 +49,7 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// save file to upload path
-	filePath := fmt.Sprintf("./%s/%s", uploadDir, uploadFile)
+	filePath := fmt.Sprintf("./%s/%s", rawDir, uploadFile)
 	if err := c.SaveFile(file, filePath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -57,7 +58,7 @@ func FilterData(c *fiber.Ctx) error {
 	}
 
 	// make filtered files directory
-	if err := os.MkdirAll(fltrDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(filterDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -67,7 +68,7 @@ func FilterData(c *fiber.Ctx) error {
 	// execute python
 	fltr := models.Fltr{}
 	app := analyzeExe
-	args := []string{"filter", "-f", filePath, "-s", fltrDir}
+	args := []string{"filter", "-f", filePath, "-s", filterDir}
 	if err := utils.CmdRunner(app, args, &fltr); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -85,7 +86,7 @@ func FilterData(c *fiber.Ctx) error {
 	data := models.ResUpload{
 		Upload:     uploadFile,
 		ServerRoot: serverRoot,
-		SaveDir:    fltrDir,
+		SaveDir:    filterDir,
 		Python:     fltr,
 	}
 

@@ -51,7 +51,7 @@ jobs:
         run: go build
       - name: Compress things up
         run: |
-          ${{ matrix.comp_er }} ${{ matrix.comp_args }} ${{ steps.get_repository_name.outputs.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }} analyze.api${{ matrix.suffix }}
+          ${{ matrix.comp_er }} ${{ matrix.comp_args }} ${{ steps.get_repository_name.outputs.REPO_NAME }}-${{ matrix.target }}.${{ matrix.comp_type }} analyze.api${{ matrix.suffix }} .env
           ls
       - uses: actions/upload-artifact@v3
         with:

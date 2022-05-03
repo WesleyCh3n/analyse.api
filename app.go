@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"log"
+	"os"
 
 	"analyze.api/app/handlers"
 	_ "analyze.api/docs"
@@ -9,12 +11,11 @@ import (
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 var (
-	port       = flag.String("port", ":3001", "Port to listen on")
-	prod       = flag.Bool("prod", true, "Enable prefork in Production")
-	staticFile = flag.String("d", "./asset/front/", "static web folder")
+	prod = flag.Bool("prod", true, "Enable prefork in Production")
 )
 
 func setupRoutes(app *fiber.App) {
@@ -25,10 +26,10 @@ func setupRoutes(app *fiber.App) {
 	apiGroup.Patch("/save", handlers.SaveRange)
 
 	fileGroup := app.Group("/file")
-	fileGroup.Static("/csv", "./file/csv/")
-	fileGroup.Static("/export", "./file/export/")
-	fileGroup.Static("/raw", "./file/raw/")
-	fileGroup.Static("/cleaning", "./file/cleaning/")
+	fileGroup.Static("/raw", os.Getenv("RAW_DIR"))
+	fileGroup.Static("/csv", os.Getenv("FILTER_DIR"))
+	fileGroup.Static("/export", os.Getenv("EXPORT_DIR"))
+	fileGroup.Static("/clean", os.Getenv("CLEAN_DIR"))
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 }
@@ -44,7 +45,7 @@ func NewServer() *fiber.App {
 
 	setupRoutes(app)
 
-	app.Static("/", *staticFile) // if serve static web
+	app.Static("/", os.Getenv("FRONT_DIR")) // if serve static web
 
 	return app
 }
@@ -67,7 +68,11 @@ func NewServer() *fiber.App {
 // @BasePath  /
 func main() {
 	flag.Parse()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	app := NewServer()
-	app.Listen(*port)
+	app.Listen(":" + os.Getenv("PORT"))
 }
