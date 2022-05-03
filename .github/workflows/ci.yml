@@ -9,6 +9,7 @@ on:
       - '*.go'
       - 'go.mod'
       - 'go.sum'
+      - '.github/workflows/**'
     branches:
       - "main"
 
@@ -22,13 +23,13 @@ jobs:
             target: x86_64-apple-darwin
             suffix: ''
             comp_er: tar
-            comp_args: -cvf
+            comp_args: -gcvf
             comp_type: tar.gz
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
             comp_er: tar
-            comp_args: -cvf
+            comp_args: -gcvf
             comp_type: tar.gz
           - os: windows-latest
             target: x86_64-pc-windows-msvc
