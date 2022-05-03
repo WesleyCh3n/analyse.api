@@ -63,13 +63,14 @@ jobs:
         shell: bash
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin.tar
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu
       - uses: actions/download-artifact@master
         with:
-          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-pc-windows-msvc.zip
+          name: ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-pc-windows-msvc
+      - run: ls
       - uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
