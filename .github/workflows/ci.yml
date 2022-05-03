@@ -3,6 +3,12 @@ name: "Continuous Integration"
 
 on:
   push:
+    paths:
+      - 'app/**'
+      - 'pkg/**'
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
     branches:
       - "main"
 
