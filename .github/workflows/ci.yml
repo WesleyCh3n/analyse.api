@@ -23,13 +23,13 @@ jobs:
             suffix: ''
             comp_er: tar
             comp_args: -cvf
-            comp_type: tar
+            comp_type: tar.gz
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
             comp_er: tar
             comp_args: -cvf
-            comp_type: tar
+            comp_type: tar.gz
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             suffix: .exe
@@ -84,6 +84,6 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin.tar
-            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu.tar
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-apple-darwin.tar.gz
+            ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-unknown-linux-gnu.tar.gz
             ${{ steps.get_repository_name.outputs.REPO_NAME }}-x86_64-pc-windows-msvc.zip
