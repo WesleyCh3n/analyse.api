@@ -15,18 +15,21 @@ jobs:
           - os: macos-latest
             target: x86_64-apple-darwin
             suffix: ''
+            comp_er: tar
             comp_type: tar
             comp_args: -cvf
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             suffix: ''
+            comp_er: tar
             comp_type: tar
             comp_args: -cvf
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             suffix: .exe
+            comp_er: 7z
             comp_type: zip
-            comp_args: ''
+            comp_args: 'a -tzip'
     runs-on: ${{ matrix.os }}
 
     steps:
