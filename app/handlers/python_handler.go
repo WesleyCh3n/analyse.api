@@ -3,9 +3,10 @@ package handlers
 import (
 	"os"
 	"path"
+	"strconv"
+
 	"analyze.api/app/models"
 	"analyze.api/pkg/utils"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,8 +31,7 @@ func Export(c *fiber.Ctx) error {
 		})
 	}
 
-	saveDir := "file/export"
-	if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(exportDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -43,8 +43,8 @@ func Export(c *fiber.Ctx) error {
 	app := analyzeExe
 	args := []string{"export"}
 	args = append(args,
-		"-f", path.Join(fltrDir, reqBody.Fltr.Rslt),
-		"-s", saveDir)
+		"-f", path.Join(filterDir, reqBody.Fltr.Rslt),
+		"-s", exportDir)
 	for _, r := range reqBody.Range {
 		args = append(args, "-r",
 			strconv.Itoa(int(r.Start))+" "+strconv.Itoa(int(r.End)))
@@ -59,7 +59,7 @@ func Export(c *fiber.Ctx) error {
 	// create meta data and send to client
 	data := models.ResExport{
 		ServerRoot: serverRoot,
-		SaveDir:    saveDir,
+		SaveDir:    exportDir,
 		Python:     exportFile,
 	}
 
@@ -85,8 +85,7 @@ func Concat(c *fiber.Ctx) error {
 		return err
 	}
 
-	saveDir := "file/export"
-	if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(exportDir, os.ModePerm); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
 			"data": nil,
@@ -102,7 +101,7 @@ func Concat(c *fiber.Ctx) error {
 	for _, r := range reqBody.Files {
 		args = append(args, "-f", r)
 	}
-	args = append(args, "-s", saveDir)
+	args = append(args, "-s", exportDir)
 	if err := utils.CmdRunner(app, args, &concatFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":  err.Error(),
@@ -112,7 +111,7 @@ func Concat(c *fiber.Ctx) error {
 
 	data := models.ResConcat{
 		ServerRoot: serverRoot,
-		SaveDir:    saveDir,
+		SaveDir:    exportDir,
 		Python:     concatFile,
 	}
 
@@ -140,12 +139,11 @@ func SaveRange(c *fiber.Ctx) error {
 	}
 
 	// execute python
-	saveDir := "file/cleaning"
 	cleanFile := models.CleanFile{}
 	app := analyzeExe
 	args := []string{"swrite"}
-	args = append(args, "-f", path.Join(uploadDir, reqBody.UploadFile))
-	args = append(args, "-s", saveDir)
+	args = append(args, "-f", path.Join(rawDir, reqBody.UploadFile))
+	args = append(args, "-s", cleanDir)
 	args = append(args, "-v", reqBody.Range)
 	if err := utils.CmdRunner(app, args, &cleanFile); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -156,7 +154,7 @@ func SaveRange(c *fiber.Ctx) error {
 
 	data := models.ResClean{
 		ServerRoot: serverRoot,
-		SaveDir:    saveDir,
+		SaveDir:    cleanDir,
 		Python:     cleanFile,
 	}
 
