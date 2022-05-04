@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var serverRoot = "http://localhost:" + os.Getenv("PORT")
+var serverRoot = os.Getenv("ROOT") + ":" + os.Getenv("PORT")
 var analyzeExe = os.Getenv("ANALYZE_EXE")
 var rawDir = os.Getenv("FILTER_DIR")
 var filterDir = os.Getenv("RAW_DIR")
