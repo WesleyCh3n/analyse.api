@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -40,7 +41,8 @@ func NewServer() *fiber.App {
 		Prefork:   *prod,
 	})
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000", // cross origin
+		AllowOrigins: fmt.Sprintf("http://localhost:%v, http://127.0.0.1:%v",
+			os.Getenv("PORT"), os.Getenv("PORT")), // cross origin
 	}))
 
 	setupRoutes(app)
