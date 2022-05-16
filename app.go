@@ -41,7 +41,7 @@ func NewServer() *fiber.App {
 		Prefork:   *prod,
 	})
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: fmt.Sprintf("http://localhost:%v, http://127.0.0.1:%v",
+		AllowOrigins: fmt.Sprintf("http://localhost:%v, http://127.0.0.1:%v, http://localhost:3000",
 			os.Getenv("PORT"), os.Getenv("PORT")), // cross origin
 	}))
 
