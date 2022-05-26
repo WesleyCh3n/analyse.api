@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -12,6 +11,7 @@ import (
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -20,7 +20,7 @@ var (
 )
 
 func setupRoutes(app *fiber.App) {
-	apiGroup := app.Group("/api")
+	apiGroup := app.Group("/api", logger.New())
 	apiGroup.Post("/upload", handlers.FilterData)
 	apiGroup.Put("/export", handlers.Export)
 	apiGroup.Put("/concat", handlers.Concat)
@@ -40,10 +40,7 @@ func NewServer() *fiber.App {
 		BodyLimit: 100 * 1024 * 1024, // 100 mb
 		Prefork:   *prod,
 	})
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: fmt.Sprintf("http://localhost:%v, http://127.0.0.1:%v, http://localhost:3000",
-			os.Getenv("PORT"), os.Getenv("PORT")), // cross origin
-	}))
+	app.Use(cors.New(cors.Config{}))
 
 	setupRoutes(app)
 
